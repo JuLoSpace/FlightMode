@@ -1,17 +1,73 @@
 //
-//  FlightModeApp.swift
-//  FlightMode
+//  FlightModeTestApp.swift
+//  FlightModeTest
 //
-//  Created by Ярослав Соловьев on 25.12.2025.
+//  Created by Ярослав Соловьев on 16.12.2025.
 //
 
 import SwiftUI
+import RevenueCat
+
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+}
 
 @main
 struct FlightModeApp: App {
+    
+    init() {
+        Purchases.configure(withAPIKey: "appl_mBgKusTNpFopOKLkFIwVbwBSIvt")
+    }
+    
+    @StateObject private var router = Router()
+    @StateObject private var user = UserModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack(path: $router.path) {
+                OnboardingScreenFirst()
+                    .navigationDestination(for: Route.self) { route in
+                        Group {
+                            switch route {
+                            case .onboarding(let screen):
+                                switch screen {
+                                case .first:
+                                    OnboardingScreenFirst()
+                                case .second:
+                                    OnboardingScreenSecond()
+                                case .third:
+                                    OnboardingScreenThird()
+                                case .fourth:
+                                    OnboardingScreenFourth()
+                                case .fifth:
+                                    OnboardingScreenFifth()
+                                case .sixth:
+                                    OnboardingScreenSixth()
+                                case .seventh:
+                                    OnboardingScreenSeventh()
+                                case .eighth:
+                                    OnboardingScreenEighth()
+                                case .nineth:
+                                    OnboardingScreenNineth()
+                                }
+                            case .paywall:
+                                PaywallScreen()
+                            }
+                        }
+                        .navigationBarBackButtonHidden(true)
+                        .interactiveDismissDisabled(false)
+                    }
+            }
+            .environmentObject(router)
+            .environmentObject(user)
         }
     }
 }
