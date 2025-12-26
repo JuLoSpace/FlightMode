@@ -37,7 +37,7 @@ final class PhysicsContainerView: UIView {
         gravity.magnitude = 2
         itemBehavior.elasticity = 0.2
         itemBehavior.density = 1000
-        itemBehavior.friction = 0.1
+        itemBehavior.friction = 0.2
         itemBehavior.resistance = 0.0
         itemBehavior.allowsRotation = true
         animator.addBehavior(gravity)
@@ -67,6 +67,11 @@ final class PhysicsContainerView: UIView {
     }
     
     func addStaticObject<Content: View>(swiftUIView: Content, width: Double, height: Double, startX: Double, startY: Double) {
+        
+        confirmView?.removeFromSuperview()
+        
+//        collision.removeBoundary(withIdentifier: "staticObject" as NSCopying)
+        
         let hostingController = UIHostingController(rootView: swiftUIView)
         hostingController.view.frame = CGRect(
             x: startX,
@@ -95,7 +100,6 @@ final class PhysicsContainerView: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        print(point)
         for mission in hostedViews.keys {
             let view = hostedViews[mission]!
             let convertedPoint = view.convert(point, from: self)
@@ -133,6 +137,14 @@ struct PhysicsView: UIViewRepresentable {
     
     var onTapMissionCallback: ((Mission) -> ())
     
+    class Coordinator {
+        var addingMissions: [Mission] = []
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
     func makeUIView(context: Context) -> PhysicsContainerView {
         let view = PhysicsContainerView()
         view.onTapMissionCallback = onTapMissionCallback
@@ -141,16 +153,18 @@ struct PhysicsView: UIViewRepresentable {
     
     func updateUIView(_ uiView: PhysicsContainerView, context: Context) {
         if let content = contentToDrop {
-            uiView.addFalling(content: content)
-            
-            DispatchQueue.main.async {
-                contentToDrop = nil
+            if !context.coordinator.addingMissions.contains(content.mission!) {
+                context.coordinator.addingMissions.append(content.mission!)
+                uiView.addFalling(content: content)
+                DispatchQueue.main.async {
+                    contentToDrop = nil
+                    context.coordinator.addingMissions.removeAll { $0 == content.mission! }
+                }
             }
         }
         if let content = staticContent {
-            uiView.addStaticObject(swiftUIView: content.view, width: content.width, height: content.height, startX: content.startX, startY: content.startY)
-            
             DispatchQueue.main.async {
+                uiView.addStaticObject(swiftUIView: content.view, width: content.width, height: content.height, startX: content.startX, startY: content.startY)
                 staticContent = nil
             }
         }
@@ -171,14 +185,8 @@ struct MissionButtonView: View {
     var body: some View {
         if !selectedMissions.contains(mission) {
             Button(action: {
-                if selectedMissions.contains(mission) {
-                    selectedMissions.removeAll { mis in
-                        mis == mission
-                    }
-                } else {
-                    selectedMissions.append(mission)
-                    contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
-                }
+                selectedMissions.append(mission)
+                contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
             }, label: {
                 VStack(alignment: .center) {
                     HStack(alignment: .center) {
@@ -195,20 +203,15 @@ struct MissionButtonView: View {
                 .padding(.all, 20)
             })
             .frame(width: width, height: height, alignment: .center)
-            .glassEffect(.regular.tint(selectedMissions.contains(mission) ? Color(hex: "FFAE17") : .clear), in: RoundedRectangle(cornerRadius: height / 2))
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: height / 2))
         } else {
             ZStack {
                 Color(hex: "FFAE17")
                     .opacity(0.5)
                     .clipShape(RoundedRectangle(cornerRadius: height/2))
                 Button(action: {
-                    if selectedMissions.contains(mission) {
-                        selectedMissions.removeAll { mis in
-                            mis == mission
-                        }
-                    } else {
-                        selectedMissions.append(mission)
-                        contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
+                    selectedMissions.removeAll { mis in
+                        mis == mission
                     }
                 }, label: {
                     VStack(alignment: .center) {
@@ -243,6 +246,29 @@ struct OnboardingScreenSixth : View {
     @State private var contentToDrop: PhysicsContent?
     @State private var staticContent: PhysicsContent?
     @State private var selectedMissions: [Mission] = []
+    
+    @State private var confirmButtonView: AnyView?
+    
+    private func updateConfirmButton(height: Double, width: Double) {
+        confirmButtonView = AnyView(
+            Button(action: {
+                if selectedMissions.count > 0 {
+                    router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
+                }
+            }, label: {
+                Text("Confirm")
+                    .font(.system(size: 20))
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+            })
+            .contentShape(.rect)
+            .glassEffect(.clear.tint(Color(hex: selectedMissions.count > 0 ? "FFAE17" : "3D3D3D")).interactive())
+        )
+        
+        staticContent = PhysicsContent(view: confirmButtonView, startX: 20, startY: height - 80.0, width: width - 40, height: 60)
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -302,52 +328,32 @@ struct OnboardingScreenSixth : View {
                     Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
+                VStack(alignment: .trailing) {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    Color(hex: "FFA600").opacity(0.35),
+                                    .clear
+                                ]), center: .center, startRadius: 0, endRadius: Double(100 + selectedMissions.count * 50)
+                            )
+                        )
+                        .frame(width: 200, height: 200)
+                        .blur(radius: Double(60 + selectedMissions.count * 10))
+                        .offset(x: 100, y: 100)
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottomTrailing)
                 PhysicsView(contentToDrop: $contentToDrop, staticContent: $staticContent, onTapMissionCallback: { mission in
-                    print(mission.name)
                     selectedMissions.removeAll{ $0 == mission }
+                    print(selectedMissions)
                 })
                     .frame(width: geometry.size.width, height: geometry.size.height)
-//                .ignoresSafeArea()
             }
             .onAppear {
-                DispatchQueue.main.async {
-                    staticContent = PhysicsContent(view: AnyView(
-                        Button(action: {
-                            if selectedMissions.count > 0 {
-                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
-                            }
-                        }, label: {
-                            Text("Confirm")
-                                .font(.system(size: 20))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 60)
-                        })
-                        .contentShape(.rect)
-                        .glassEffect(.clear.tint(Color(hex: selectedMissions.count > 0 ? "FFAE17" : "3D3D3D")).interactive())
-                    ), startX: 20, startY: geometry.size.height - 80.0, width: geometry.size.width - 40, height: 60)
-                }
+                updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
             }
             .onChange(of: selectedMissions) {
-                DispatchQueue.main.async {
-                    staticContent = PhysicsContent(view: AnyView(
-                        Button(action: {
-                            if selectedMissions.count > 0 {
-                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
-                            }
-                        }, label: {
-                            Text("Confirm")
-                                .font(.system(size: 20))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 60)
-                        })
-                        .contentShape(.rect)
-                        .glassEffect(.clear.tint(Color(hex: selectedMissions.count > 0 ? "FFAE17" : "3D3D3D")).interactive())
-                    ), startX: 20, startY: geometry.size.height - 80.0, width: geometry.size.width - 40, height: 60)
-                }
+                updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

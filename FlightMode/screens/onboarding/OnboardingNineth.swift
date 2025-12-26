@@ -90,6 +90,7 @@ struct OnboardingScreenNineth : View {
                 .frame(width: geometry.size.width - 40)
                 .background(.white.opacity(0.03))
                 .clipShape(SpeechBubbleRight())
+                .offset(x: geometry.size.width * pow(sin(step), 5))
                 HStack {
                     Text("Good luck, Pilot.")
                         .font(.custom("Montserrat", size: 16))
@@ -103,6 +104,7 @@ struct OnboardingScreenNineth : View {
                 .frame(width: geometry.size.width - 40)
                 .background(.white.opacity(0.03))
                 .clipShape(SpeechBubbleRight())
+                .offset(x: geometry.size.width * pow(sin(step), 4))
                 HStack {
                     Spacer()
                     Image("onboarding_9_1")
@@ -111,6 +113,7 @@ struct OnboardingScreenNineth : View {
                         .foregroundStyle(.white)
                         .fontWeight(.bold)
                 }
+                .offset(x: geometry.size.width * pow(sin(step), 3))
                 HStack {
                     Text("🚀 Ready for takeoff!")
                         .font(.custom("Montserrat", size: 16))
@@ -124,6 +127,7 @@ struct OnboardingScreenNineth : View {
                 .frame(width: geometry.size.width - 40)
                 .background(.white.opacity(0.03))
                 .clipShape(SpeechBubbleLeft())
+                .offset(x: -geometry.size.width * pow(sin(step), 2))
                 HStack {
                     Image("onboarding_9_2")
                     Text("You")
@@ -132,6 +136,7 @@ struct OnboardingScreenNineth : View {
                         .fontWeight(.bold)
                     Spacer()
                 }
+                .offset(x: -geometry.size.width * pow(sin(step), 1))
                 Spacer()
                 Button(action: {
                     router.navigate(to: Route.paywall)
@@ -151,7 +156,7 @@ struct OnboardingScreenNineth : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))
         .onAppear {
-            withAnimation(.linear(duration: 0.8)) {
+            withAnimation(.easeInOut(duration: 1)) {
                 step = 0.0
             }
         }

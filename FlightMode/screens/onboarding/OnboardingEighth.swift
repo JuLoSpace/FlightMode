@@ -71,7 +71,7 @@ struct OnboardingScreenEighth : View {
                         .offset(y: 50)
                         .clipped()
                     }
-                    .offset(y: 100)
+                    .offset(y: 100 + geometry.size.height * sin(step))
                     .gesture(
                         DragGesture().onChanged { value in
                             isMoving = true
@@ -83,6 +83,7 @@ struct OnboardingScreenEighth : View {
                         }
                     )
                     .animation(.easeInOut, value: timeAngle)
+                    .shadow(color: Color(hex: "FFA600").opacity(0.15), radius: 100, x: -40.0, y: -40.0)
                     HStack {
                         Button(action: {
                             router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
@@ -114,7 +115,7 @@ struct OnboardingScreenEighth : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))
         .onAppear {
-            withAnimation(.linear(duration: 0.8)) {
+            withAnimation(.easeInOut(duration: 0.8)) {
                 step = 0.0
             }
         }

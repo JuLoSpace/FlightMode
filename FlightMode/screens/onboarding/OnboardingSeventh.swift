@@ -59,6 +59,7 @@ struct OnboardingScreenSeventh : View {
                     Text("FlightMode collects minimal usage data:")
                         .font(.custom("Montserrat", size: 14))
                         .foregroundStyle(.white)
+                        .offset(x: geometry.size.width * pow(sin(step), 4))
                     HStack(alignment: .center) {
                         Image("onboarding_7_2")
                         Text("Number of completed flights")
@@ -72,6 +73,7 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .offset(x: geometry.size.width * pow(sin(step), 3))
                     HStack(alignment: .center) {
                         Image("onboarding_7_2")
                         Text("Mission categories you choose")
@@ -85,6 +87,7 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .offset(x: geometry.size.width * pow(sin(step), 2))
                     HStack(alignment: .center) {
                         Image("onboarding_7_3")
                         Text("Time spent in focus mode")
@@ -98,6 +101,7 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .offset(x: geometry.size.width * pow(sin(step), 1))
                 }
                 .padding(.top, 10)
                 Spacer()
@@ -119,7 +123,7 @@ struct OnboardingScreenSeventh : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))
         .onAppear {
-            withAnimation(.linear(duration: 0.8)) {
+            withAnimation(.easeInOut(duration: 0.8)) {
                 step = 0.0
             }
         }
