@@ -33,7 +33,7 @@ struct FlightModeApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                OnboardingScreenFirst()
+                OnboardingScreenSixth()
                     .navigationDestination(for: Route.self) { route in
                         Group {
                             switch route {

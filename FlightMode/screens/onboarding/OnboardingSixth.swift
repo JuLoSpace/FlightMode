@@ -70,7 +70,7 @@ final class PhysicsContainerView: UIView {
         
         confirmView?.removeFromSuperview()
         
-//        collision.removeBoundary(withIdentifier: "staticObject" as NSCopying)
+        collision.removeBoundary(withIdentifier: "staticObject" as NSCopying)
         
         let hostingController = UIHostingController(rootView: swiftUIView)
         hostingController.view.frame = CGRect(
@@ -350,10 +350,19 @@ struct OnboardingScreenSixth : View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
             }
             .onAppear {
-                updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
+                if geometry.size.width != 0 && geometry.size.height != 0 {
+                    updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
+                }
             }
             .onChange(of: selectedMissions) {
-                updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
+                if geometry.size.width != 0 && geometry.size.height != 0 {
+                    updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
+                }
+            }
+            .onChange(of: geometry.size) {
+                if geometry.size.width != 0 && geometry.size.height != 0 {
+                    updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
