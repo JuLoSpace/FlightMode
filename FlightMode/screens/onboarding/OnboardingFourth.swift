@@ -68,7 +68,7 @@ struct OnboardingScreenFourth: View {
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 54)
                             })
-                            .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                            .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                             Button(action: {
                                 router.navigate(to: Route.onboarding(Route.OnboardingScreen.third))
                             }, label: {
@@ -79,7 +79,7 @@ struct OnboardingScreenFourth: View {
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 54)
                             })
-                            .glassEffect(.clear.tint(Color(hex: "3D3D3D")).interactive())
+                            .glassEffect(.regular.tint(Color(hex: "3D3D3D")).interactive())
                         }
                     }
                     .safeAreaPadding(.bottom)

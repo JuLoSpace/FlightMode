@@ -70,8 +70,6 @@ final class PhysicsContainerView: UIView {
         
         confirmView?.removeFromSuperview()
         
-        collision.removeBoundary(withIdentifier: "staticObject" as NSCopying)
-        
         let hostingController = UIHostingController(rootView: swiftUIView)
         hostingController.view.frame = CGRect(
             x: startX,
@@ -86,6 +84,7 @@ final class PhysicsContainerView: UIView {
         addSubview(hostingController.view)
 
         let bounderyPath = UIBezierPath(rect: hostingController.view.frame)
+        collision.removeBoundary(withIdentifier: "staticObject" as NSCopying)
         collision.addBoundary(withIdentifier: "staticObject" as NSCopying, for: bounderyPath)
     }
     
@@ -252,19 +251,19 @@ struct OnboardingScreenSixth : View {
     private func updateConfirmButton(height: Double, width: Double) {
         confirmButtonView = AnyView(
             Button(action: {
-                if selectedMissions.count > 0 {
+                if selectedMissions.count == 5 {
                     router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
                 }
             }, label: {
                 Text("Confirm")
-                    .font(.system(size: 20))
+                    .font(.custom("Montserrat", size: 20))
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 60)
             })
             .contentShape(.rect)
-            .glassEffect(.clear.tint(Color(hex: selectedMissions.count > 0 ? "FFAE17" : "3D3D3D")).interactive())
+            .glassEffect(.regular.tint(Color(hex: selectedMissions.count == 5 ? "FFAE17" : "3D3D3D")).interactive())
         )
         
         staticContent = PhysicsContent(view: confirmButtonView, startX: 20, startY: height - 80.0, width: width - 40, height: 60)
@@ -301,8 +300,9 @@ struct OnboardingScreenSixth : View {
                         Spacer()
                     }
                     .padding(.horizontal, 20)
-                    Text("Сhoose at least one mission to begin your flight.")
-                        .font(.custom("Montserrat", size: 14))
+                    Text("Сhoose five missions to begin your flight.")
+                        .font(.custom("Montserrat", size: 18))
+                        .fontWeight(.light)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
@@ -364,6 +364,7 @@ struct OnboardingScreenSixth : View {
                     updateConfirmButton(height: geometry.size.height, width: geometry.size.width)
                 }
             }
+            .sensoryFeedback(.impact(weight: .medium), trigger: selectedMissions.count)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))

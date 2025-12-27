@@ -79,7 +79,12 @@ struct OnboardingScreenNineth : View {
                         .foregroundStyle(Color(hex: "FFAE17"))
                 }
                 HStack {
-                    Text("Cadet, your cockpit is ready. Stay focused. Complete your mission. Earn your wings. Your first successful flight earns +500 bonus miles.")
+                    Text("Cadet")
+                        .font(.custom("Montserrat", size: 16))
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                    +
+                    Text(", your cockpit is ready. Stay focused. Complete your mission. Earn your wings. Your first successful flight earns +500 bonus miles.")
                         .font(.custom("Montserrat", size: 16))
                         .foregroundStyle(.white)
                     Spacer()
@@ -148,7 +153,7 @@ struct OnboardingScreenNineth : View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
             }
             .padding(.horizontal, 20)

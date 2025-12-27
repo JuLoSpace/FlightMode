@@ -54,7 +54,7 @@ struct Card: View, Animatable {
         .padding(.vertical, 10)
         .frame(width: a, height: a)
         .rotationEffect(Angle(degrees: -15))
-        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12).rotation(Angle(degrees: -15), anchor: .center))
+        .glassEffect(.regular.tint(Color(hex: "0E0E0E")), in: RoundedRectangle(cornerRadius: 12).rotation(Angle(degrees: -15), anchor: .center))
         .offset(x: getOffset())
     }
 }
@@ -95,10 +95,11 @@ struct OnboardingScreenSecond : View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
-                Text("In FlightApp, every focus session becomes a flight.")
+                Text("In FlightMode, every focus session becomes a flight.")
                     .padding(.horizontal, 40)
-                    .padding(.top, 12)
+                    .padding(.top, 6)
                     .font(.custom("Montserrat", size: 20))
+                    .fontWeight(.light)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 ZStack {
@@ -119,7 +120,7 @@ struct OnboardingScreenSecond : View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

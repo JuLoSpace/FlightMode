@@ -108,34 +108,54 @@ struct PaywallScreen : View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 0) {
                         ForEach(0..<paywallCards.count, id: \.self) { i in
-                            VStack(alignment: .leading, spacing: 0) {
-                                VStack(alignment: .center) {
-                                    if let image = paywallCards[i].image {
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
+                            ZStack {
+                                VStack(alignment: .trailing) {
+                                    Circle()
+                                        .fill(
+                                            RadialGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(hex: "FFA600").opacity(0.35),
+                                                    .clear
+                                                ]), center: .center, startRadius: 0, endRadius: geometry.size.height * 0.2)
+                                        )
+                                        .blur(radius: geometry.size.height * 0.08)
+                                        .offset(x: geometry.size.height * 0.2, y: geometry.size.height * 0.1)
+                                }
+                                .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42, alignment: .bottomTrailing)
+                                VStack(alignment: .leading, spacing: 0) {
+                                    VStack(alignment: .center) {
+                                        if let image = paywallCards[i].image {
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                        }
+                                    }
+                                    .frame(width: geometry.size.width - 60)
+                                    if let title = paywallCards[i].title {
+                                        Text(title)
+                                            .font(.custom("Wattauchimma", size: 24))
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
+                                    }
+                                    if let description = paywallCards[i].description {
+                                        Text(description)
+                                            .font(.custom("Montserrat", size: 16))
+                                            .fontWeight(.light)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
                                     }
                                 }
-                                .frame(width: geometry.size.width - 60)
-                                if let title = paywallCards[i].title {
-                                    Text(title)
-                                        .font(.custom("Wattauchimma", size: 24))
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 10)
-                                }
-                                if let description = paywallCards[i].description {
-                                    Text(description)
-                                        .font(.custom("Montserrat", size: 16))
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 10)
-                                }
+                                .padding(.vertical, 20)
+                                .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
+                                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                                .padding(.horizontal, 20)
                             }
-                            .padding(.vertical, 20)
                             .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
-                            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .clipped()
                             .padding(.horizontal, 20)
                         }
                     }

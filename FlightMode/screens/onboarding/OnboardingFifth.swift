@@ -87,6 +87,7 @@ struct OnboardingScreenFifth: View {
                 Text("Only completed flights count toward your rank.")
                     .padding()
                     .font(.custom("Montserrat", size: 16))
+                    .fontWeight(.light)
                     .foregroundStyle(.white)
                 ForEach(Career.allCases, id: \.self) { career in
                     CareerCard(image: career.imageName, name: career.name, flights: career.flights, width: geometry.size.width - 40, height: 70)
@@ -104,7 +105,7 @@ struct OnboardingScreenFifth: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
             }
         }

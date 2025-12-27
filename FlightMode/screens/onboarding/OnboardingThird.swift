@@ -44,7 +44,7 @@ struct CardView : View, Animatable {
                 .clipped()
                 .frame(width: width, height: height)
         }
-        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
         .frame(width: width, height: height)
         .clipped()
     }
@@ -97,7 +97,7 @@ struct OnboardingScreenThird : View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
             }
             .padding(.horizontal, 20)

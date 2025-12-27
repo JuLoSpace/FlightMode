@@ -83,7 +83,7 @@ struct OnboardingScreenEighth : View {
                         }
                     )
                     .animation(.easeInOut, value: timeAngle)
-                    .shadow(color: Color(hex: "FFA600").opacity(0.15), radius: 100, x: -40.0, y: -40.0)
+                    .shadow(color: Color(hex: "FFA600").opacity(0.15), radius: 60, x: 0.0, y: -40.0)
                     HStack {
                         Button(action: {
                             router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
@@ -95,7 +95,7 @@ struct OnboardingScreenEighth : View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
                         })
-                        .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                        .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                         Button(action: {
                             router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
                         }, label: {
@@ -106,7 +106,7 @@ struct OnboardingScreenEighth : View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
                         })
-                        .glassEffect(.clear.tint(Color(hex: "3D3D3D")).interactive())
+                        .glassEffect(.regular.tint(Color(hex: "3D3D3D")).interactive())
                     }
                 }
             }

@@ -57,7 +57,8 @@ struct OnboardingScreenSeventh : View {
                 }
                 VStack(alignment: .leading) {
                     Text("FlightMode collects minimal usage data:")
-                        .font(.custom("Montserrat", size: 14))
+                        .font(.custom("Montserrat", size: 16))
+                        .fontWeight(.light)
                         .foregroundStyle(.white)
                         .offset(x: geometry.size.width * pow(sin(step), 4))
                     HStack(alignment: .center) {
@@ -115,7 +116,7 @@ struct OnboardingScreenSeventh : View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
             }
             .padding(.horizontal, 20)

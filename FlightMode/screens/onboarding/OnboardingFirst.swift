@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 extension Color {
     init(hex: String) {
@@ -43,6 +44,12 @@ struct OnboardingScreenFirst: View {
     @State private var rotateEarth: Bool = false
     @State private var step: Double = 1
     
+    @State var mapPosition: MapCameraPosition = MapCameraPosition.region(
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 0, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 100, longitudeDelta: 100),
+        )
+    )
+    
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             VStack(alignment: .leading) {
@@ -70,20 +77,24 @@ struct OnboardingScreenFirst: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            Image("earth")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .padding(.vertical, 20)
-                .padding(.horizontal, 20)
-                .rotationEffect(Angle(degrees: rotateEarth ? 360 : 0))
-                .animation(.linear(duration: 30).repeatForever(autoreverses: false), value: rotateEarth)
-                .onAppear() {
-                    rotateEarth = true
-                }
+            Map(position: $mapPosition)
+                .mapStyle(.hybrid(elevation: .realistic))
+                .frame(height: 400)
+//            Image("earth")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
+//                .padding(.vertical, 20)
+//                .padding(.horizontal, 20)
+//                .rotationEffect(Angle(degrees: rotateEarth ? 360 : 0))
+//                .animation(.linear(duration: 30).repeatForever(autoreverses: false), value: rotateEarth)
+//                .onAppear() {
+//                    rotateEarth = true
+//                }
             Text("Your journey to deep focus begins here.")
                 .padding()
                 .font(.custom("Montserrat", size: 18))
                 .foregroundStyle(.white)
+                .fontWeight(.light)
             Spacer()
             Button(action: {
                 router.navigate(to: Route.onboarding(Route.OnboardingScreen.second))
@@ -95,7 +106,7 @@ struct OnboardingScreenFirst: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 60)
             })
-            .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+            .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
             .padding(.horizontal, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
