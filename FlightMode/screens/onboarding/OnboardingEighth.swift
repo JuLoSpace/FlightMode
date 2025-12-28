@@ -75,7 +75,7 @@ struct OnboardingScreenEighth : View {
                     .gesture(
                         DragGesture().onChanged { value in
                             isMoving = true
-                            timeAngle += value.translation.height * 0.01
+                            timeAngle += value.velocity.height * 0.005 // changing position with speed is more comfortable for usage
                         }
                         .onEnded { value in
                             isMoving = false
@@ -84,6 +84,7 @@ struct OnboardingScreenEighth : View {
                     )
                     .animation(.easeInOut, value: timeAngle)
                     .shadow(color: Color(hex: "FFA600").opacity(0.15), radius: 60, x: 0.0, y: -40.0)
+                    .sensoryFeedback(.impact(weight: .light), trigger: Int(timeAngle / 15))
                     HStack {
                         Button(action: {
                             router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))

@@ -87,6 +87,7 @@ struct PaywallScreen : View {
                         Text("Restore")
                             .font(.custom("Montserrat", size: 16))
                             .foregroundStyle(.white.opacity(0.5))
+                            .background(.clear)
                     })
                     Spacer()
                     Button(action: {
@@ -344,14 +345,26 @@ struct PaywallScreen : View {
                 .glassEffect(.clear.tint(selectedSubscriptionType != nil ? Color(hex: "FFAE17") : Color(hex: "3D3D3D")).interactive())
                 .padding(.horizontal, 20)
                 .padding(.bottom, 10)
-                HStack {
+                HStack(alignment: .center) {
                     Button(action: {
                         
                     }, label: {
-                        Text("Privacy | Terms")
+                        Text("Privacy")
                             .font(.custom("Montserrat", size: 12))
                             .foregroundStyle(.white.opacity(0.75))
                     })
+                    .background(.clear)
+                    Text("|")
+                        .font(.custom("Montserrat", size: 12))
+                        .foregroundStyle(.white.opacity(0.75))
+                    Button(action: {
+                        
+                    }, label: {
+                        Text("Terms")
+                            .font(.custom("Montserrat", size: 12))
+                            .foregroundStyle(.white.opacity(0.75))
+                    })
+                    .background(.clear)
                     Spacer()
                     Text("Cancel anytime • Auto-renews")
                         .font(.custom("Montserrat", size: 12))
