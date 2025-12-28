@@ -23,11 +23,11 @@ struct PaywallScreen : View {
     @State var step: Double = 1.0
     @State var wallIndex: Int = 0
     @State private var timer: Timer?
-    @State private var scrollPosition = ScrollPosition(edge: .leading)
+    @State private var scrollPosition: Int?
     
     @State var scrollWidth: Double?
     
-    @State var isAnimatable: Bool = true
+    @State var isUserScrolling: Bool = false
     
     @State var selectedSubscriptionType: SubscriptionType?
     
@@ -62,18 +62,9 @@ struct PaywallScreen : View {
         ),
     ]
     
-    private func startWallAnimation() {
+    func startAnimation() {
         timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
-            if isAnimatable {
-                withAnimation(.linear(duration: 1.0)) {
-                    wallIndex = (wallIndex + 1) % 5
-                }
-                if let width = scrollWidth {
-                    withAnimation(.easeInOut(duration: 1.0)) {
-                        scrollPosition.scrollTo(x: width * Double(wallIndex))
-                    }
-                }
-            }
+            wallIndex = (wallIndex + 1) % paywallCards.count
         }
     }
     
@@ -103,82 +94,79 @@ struct PaywallScreen : View {
                 .padding(.top, 20)
                 .padding(.horizontal, 20)
                 Text("PREMIUM ACCESS")
-                    .font(.custom("Wattauchimma", size: 48))
+                    .font(.custom("Wattauchimma", size: 44))
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 0) {
-                        ForEach(0..<paywallCards.count, id: \.self) { i in
-                            ZStack {
-                                VStack(alignment: .trailing) {
-                                    Circle()
-                                        .fill(
-                                            RadialGradient(
-                                                gradient: Gradient(colors: [
-                                                    Color(hex: "FFA600").opacity(0.35),
-                                                    .clear
-                                                ]), center: .center, startRadius: 0, endRadius: geometry.size.height * 0.2)
-                                        )
-                                        .blur(radius: geometry.size.height * 0.08)
-                                        .offset(x: geometry.size.height * 0.2, y: geometry.size.height * 0.1)
-                                }
-                                .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42, alignment: .bottomTrailing)
-                                VStack(alignment: .leading, spacing: 0) {
-                                    VStack(alignment: .center) {
-                                        if let image = paywallCards[i].image {
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                        }
-                                    }
-                                    .frame(width: geometry.size.width - 60)
-                                    if let title = paywallCards[i].title {
-                                        Text(title)
-                                            .font(.custom("Wattauchimma", size: 24))
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 20)
-                                            .padding(.top, 10)
-                                    }
-                                    if let description = paywallCards[i].description {
-                                        Text(description)
-                                            .font(.custom("Montserrat", size: 16))
-                                            .fontWeight(.light)
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 20)
-                                            .padding(.top, 10)
-                                    }
-                                }
-                                .padding(.vertical, 20)
-                                .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
-                                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
-                                .padding(.horizontal, 20)
+                TabView(selection: $wallIndex) {
+                    ForEach(0..<paywallCards.count, id: \.self) { i in
+                        ZStack {
+                            VStack(alignment: .trailing) {
+                                Circle()
+                                    .fill(
+                                        RadialGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(hex: "FFA600").opacity(0.35),
+                                                .clear
+                                            ]), center: .center, startRadius: 0, endRadius: geometry.size.height * 0.2)
+                                    )
+                                    .blur(radius: geometry.size.height * 0.08)
+                                    .offset(x: geometry.size.height * 0.2, y: geometry.size.height * 0.1)
                             }
+                            .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42, alignment: .bottomTrailing)
+                            VStack(alignment: .leading, spacing: 0) {
+                                VStack(alignment: .center) {
+                                    if let image = paywallCards[i].image {
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    }
+                                }
+                                .frame(width: geometry.size.width - 60)
+                                if let title = paywallCards[i].title {
+                                    Text(title)
+                                        .font(.custom("Wattauchimma", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 20)
+                                        .padding(.top, 10)
+                                }
+                                if let description = paywallCards[i].description {
+                                    Text(description)
+                                        .font(.custom("Montserrat", size: 16))
+                                        .fontWeight(.light)
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 20)
+                                        .padding(.top, 10)
+                                }
+                            }
+                            .padding(.vertical, 20)
                             .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .clipped()
+                            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
                             .padding(.horizontal, 20)
                         }
+                        .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .clipped()
+                        .padding(.horizontal, 20)
+                        .tag(i)
                     }
                 }
-                .scrollPosition($scrollPosition)
-                .scrollDisabled(true)
-                .onScrollGeometryChange(for: CGPoint.self) { geo in
-                    return geo.contentOffset
-                } action: { oldValue, newValue in
-//                    if (geometry.size.width != 0.0) {
-//                        let index: Int = Int(round(newValue.x / geometry.size.width))
-//                        wallIndex = index
-//                        timer?.invalidate()
-//                        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-//                            withAnimation(.easeInOut(duration: 0.5)) {
-//                                scrollPosition.scrollTo(x: geometry.size.width * Double(wallIndex))
-//                            }
-//                        }
-//                    }
+                .frame(height: geometry.size.height * 0.42)
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .animation(.easeInOut(duration: 1), value: wallIndex)
+                .transition(.slide)
+                .onChange(of: wallIndex) { oldValue, newValue in
+                    if (isUserScrolling) {
+                        wallIndex = newValue
+                    }
                 }
+                .simultaneousGesture(DragGesture().onChanged { _ in
+                    isUserScrolling = true
+                }.onEnded { _ in
+                    isUserScrolling = false
+                })
                 HStack {
-                    ForEach(0..<5, id: \.self) { i in
+                    ForEach(0..<paywallCards.count, id: \.self) { i in
                         Circle()
                             .frame(width: 8, height: 8)
                             .foregroundStyle(.white.opacity(i == wallIndex ? 1.0 : 0.5))
@@ -376,7 +364,7 @@ struct PaywallScreen : View {
                 if scrollWidth == nil && geometry.size.width != 0 {
                     scrollWidth = geometry.size.width
                 }
-                startWallAnimation()
+                startAnimation()
             }
             .onChange(of: geometry.size.width, initial: true) { _, newWidth in
                 if scrollWidth == nil && newWidth != 0 {

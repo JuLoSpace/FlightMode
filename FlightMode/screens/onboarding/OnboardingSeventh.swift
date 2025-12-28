@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingScreenSeventh : View {
     
-    @State var step: Double = 1.0
+    @State var step: Double = Double.pi / 2
     @EnvironmentObject var router: Router
     
     var body: some View {
@@ -27,14 +27,14 @@ struct OnboardingScreenSeventh : View {
                 .padding(.top, 20)
                 HStack {
                     Text("YOUR DATA,")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     Spacer()
                 }
                 HStack {
                     Text("YOUR CONTROL")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
                 }
@@ -60,7 +60,8 @@ struct OnboardingScreenSeventh : View {
                         .font(.custom("Montserrat", size: 16))
                         .fontWeight(.regular)
                         .foregroundStyle(.white)
-                        .offset(x: geometry.size.width * pow(sin(step), 4))
+                        .offset(x: geometry.size.width * sin(step))
+                        .animation(.easeInOut(duration: 0.8).delay(0), value: step)
                     HStack(alignment: .center) {
                         Image("onboarding_7_2")
                         Text("Number of completed flights")
@@ -74,7 +75,8 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .offset(x: geometry.size.width * pow(sin(step), 3))
+                    .offset(x: geometry.size.width * sin(step))
+                    .animation(.easeInOut(duration: 0.8).delay(0.05), value: step)
                     HStack(alignment: .center) {
                         Image("onboarding_7_2")
                         Text("Mission categories you choose")
@@ -88,7 +90,8 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .offset(x: geometry.size.width * pow(sin(step), 2))
+                    .offset(x: geometry.size.width * sin(step))
+                    .animation(.easeInOut(duration: 0.8).delay(0.1), value: step)
                     HStack(alignment: .center) {
                         Image("onboarding_7_3")
                         Text("Time spent in focus mode")
@@ -102,7 +105,8 @@ struct OnboardingScreenSeventh : View {
                     .frame(width: geometry.size.width - 40)
                     .background(.white.opacity(0.03))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .offset(x: geometry.size.width * pow(sin(step), 1))
+                    .offset(x: geometry.size.width * sin(step))
+                    .animation(.easeInOut(duration: 0.8).delay(0.15), value: step)
                 }
                 .padding(.top, 10)
                 Spacer()

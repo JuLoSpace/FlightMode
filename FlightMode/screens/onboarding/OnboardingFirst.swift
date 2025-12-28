@@ -44,18 +44,18 @@ struct OnboardingScreenFirst: View {
     @State private var rotateEarth: Bool = false
     @State private var step: Double = 1
     
-    @State var mapPosition: MapCameraPosition = MapCameraPosition.region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 0, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 100, longitudeDelta: 100),
-        )
-    )
+    @State var cameraPosition: MapCameraPosition = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), distance: 20000000.0))
+    
+    @State var offset: Double = 0.0
+    
+    @State private var animationTimer: Timer?
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             VStack(alignment: .leading) {
                 HStack {
                     Text("WELCOME")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     Spacer()
@@ -64,12 +64,12 @@ struct OnboardingScreenFirst: View {
                 }
                 HStack {
                     Text("TO")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     Spacer()
                     Text("FLIGHTMODE")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
                 }
@@ -77,8 +77,9 @@ struct OnboardingScreenFirst: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            Map(position: $mapPosition)
+            Map(position: $cameraPosition, interactionModes: [],)
                 .mapStyle(.hybrid(elevation: .realistic))
+                .mapControlVisibility(.hidden)
                 .frame(height: 400)
 //            Image("earth")
 //                .resizable()
@@ -112,8 +113,9 @@ struct OnboardingScreenFirst: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))
         .onAppear {
-            withAnimation(.default) {
-                step = 0
+            animationTimer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { _ in
+                cameraPosition = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: offset, longitude: offset), distance: 20000000.0))
+                offset += 0.01
             }
         }
     }

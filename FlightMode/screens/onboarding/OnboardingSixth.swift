@@ -288,7 +288,7 @@ struct OnboardingScreenSixth : View {
                     .padding(.horizontal, 20)
                     HStack {
                         Text("SELECT YOUR")
-                            .font(.custom("Wattauchimma", size: 48))
+                            .font(.custom("Wattauchimma", size: 44))
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                         Spacer()
@@ -296,7 +296,7 @@ struct OnboardingScreenSixth : View {
                     .padding(.horizontal, 20)
                     HStack {
                         Text("FLIGHT MISSIONS")
-                            .font(.custom("Wattauchimma", size: 48))
+                            .font(.custom("Wattauchimma", size: 44))
                             .fontWeight(.bold)
                             .foregroundStyle(Color(hex: "FFAE17"))
                         Spacer()

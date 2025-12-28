@@ -11,7 +11,7 @@ struct OnboardingScreenFourth: View {
     
     @EnvironmentObject var router: Router
     
-    @State private var step: Double = 1
+    @State private var step: Double = Double.pi / 2
     
     var body: some View {
         GeometryReader { geometry in
@@ -31,14 +31,14 @@ struct OnboardingScreenFourth: View {
                         VStack {
                             HStack {
                                 Text("ENABLE FOCUS")
-                                    .font(.custom("Wattauchimma", size: 48))
+                                    .font(.custom("Wattauchimma", size: 44))
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
                                 Spacer()
                             }
                             HStack {
                                 Text("PROTECTION")
-                                    .font(.custom("Wattauchimma", size: 48))
+                                    .font(.custom("Wattauchimma", size: 44))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "FFAE17"))
                                 Spacer()

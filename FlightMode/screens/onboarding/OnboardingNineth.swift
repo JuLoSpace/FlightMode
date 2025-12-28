@@ -50,7 +50,8 @@ struct SpeechBubbleLeft : Shape {
 struct OnboardingScreenNineth : View {
     
     @EnvironmentObject var router: Router
-    @State var step: Double = 1.0
+    @State var step: Double = Double.pi / 2
+    @State var step1: Double = Double.pi / 2
     
     var body: some View {
         GeometryReader { geometry in
@@ -67,14 +68,14 @@ struct OnboardingScreenNineth : View {
                 .padding(.top, 20)
                 HStack {
                     Text("READY FOR YOUR")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     Spacer()
                 }
                 HStack {
                     Text("FIRST FLIGHT?")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
                 }
@@ -132,7 +133,7 @@ struct OnboardingScreenNineth : View {
                 .frame(width: geometry.size.width - 40)
                 .background(.white.opacity(0.03))
                 .clipShape(SpeechBubbleLeft())
-                .offset(x: -geometry.size.width * pow(sin(step), 2))
+                .offset(x: -geometry.size.width * pow(sin(step1), 2))
                 HStack {
                     Image("onboarding_9_2")
                     Text("You")
@@ -141,10 +142,15 @@ struct OnboardingScreenNineth : View {
                         .fontWeight(.bold)
                     Spacer()
                 }
-                .offset(x: -geometry.size.width * pow(sin(step), 1))
+                .offset(x: -geometry.size.width * pow(sin(step1), 1))
                 Spacer()
                 Button(action: {
-                    router.navigate(to: Route.paywall)
+                    withAnimation(.easeInOut(duration: 1)) {
+                        step1 = 0
+                    }
+                    Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                        router.navigate(to: Route.paywall)
+                    }
                 }, label: {
                     Text("🚀 Ready for Takeoff!")
                         .font(.system(size: 20))
@@ -155,6 +161,7 @@ struct OnboardingScreenNineth : View {
                 })
                 .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 .padding(.horizontal, 20)
+                .offset(y: geometry.size.height * cos(step1))
             }
             .padding(.horizontal, 20)
         }
@@ -162,7 +169,7 @@ struct OnboardingScreenNineth : View {
         .background(Color(hex: "0E0E0E"))
         .onAppear {
             withAnimation(.easeInOut(duration: 1)) {
-                step = 0.0
+                step = 0
             }
         }
     }

@@ -52,7 +52,7 @@ struct OnboardingScreenFifth: View {
     
     @EnvironmentObject var router: Router
     
-    @State private var step: Double = 1
+    @State private var step: Double = Double.pi / 2.0
     
     var body: some View {
         GeometryReader { geometry in
@@ -70,7 +70,7 @@ struct OnboardingScreenFifth: View {
                 .padding(.horizontal, 20)
                 HStack {
                     Text("YOUR PILOT")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     Spacer()
@@ -78,7 +78,7 @@ struct OnboardingScreenFifth: View {
                 .padding(.horizontal, 20)
                 HStack {
                     Text("CAREER")
-                        .font(.custom("Wattauchimma", size: 48))
+                        .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
                     Spacer()
@@ -92,7 +92,8 @@ struct OnboardingScreenFifth: View {
                 ForEach(Career.allCases, id: \.self) { career in
                     CareerCard(image: career.imageName, name: career.name, flights: career.flights, width: geometry.size.width - 40, height: 60)
                         .padding(.horizontal, 20)
-                        .offset(x: geometry.size.width * pow(sin(step), Double((Career.allCases.count - career.index))))
+                        .offset(x: geometry.size.width * sin(step))
+                        .animation(.easeInOut(duration: 0.8).delay(Double(career.index) * 0.05), value: step)
                 }
                 Spacer()
                 Button(action: {
