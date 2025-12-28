@@ -87,10 +87,10 @@ struct OnboardingScreenFifth: View {
                 Text("Only completed flights count toward your rank.")
                     .padding()
                     .font(.custom("Montserrat", size: 16))
-                    .fontWeight(.light)
+                    .fontWeight(.regular)
                     .foregroundStyle(.white)
                 ForEach(Career.allCases, id: \.self) { career in
-                    CareerCard(image: career.imageName, name: career.name, flights: career.flights, width: geometry.size.width - 40, height: 70)
+                    CareerCard(image: career.imageName, name: career.name, flights: career.flights, width: geometry.size.width - 40, height: 60)
                         .padding(.horizontal, 20)
                         .offset(x: geometry.size.width * pow(sin(step), Double((Career.allCases.count - career.index))))
                 }

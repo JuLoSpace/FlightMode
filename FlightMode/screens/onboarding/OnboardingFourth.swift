@@ -16,7 +16,7 @@ struct OnboardingScreenFourth: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                ZStack {
+                ZStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 0) {
                         Button(action: {
                             router.navigateBack()
@@ -55,9 +55,9 @@ struct OnboardingScreenFourth: View {
                             .frame(width: geometry.size.width)
                             .offset(y: geometry.size.height * sin(step))
                     }
+                    .clipped()
                     VStack(alignment: .leading) {
-                        Spacer()
-                        HStack {
+                        HStack(alignment: .bottom) {
                             Button(action: {
                                 router.navigate(to: Route.onboarding(Route.OnboardingScreen.fifth))
                             }, label: {
@@ -82,7 +82,7 @@ struct OnboardingScreenFourth: View {
                             .glassEffect(.regular.tint(Color(hex: "3D3D3D")).interactive())
                         }
                     }
-                    .safeAreaPadding(.bottom)
+                    .frame(height: geometry.size.height, alignment: .bottom)
                     .padding(.horizontal, 20)
                 }
             }

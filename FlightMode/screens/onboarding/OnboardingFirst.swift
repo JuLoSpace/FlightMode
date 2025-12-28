@@ -94,7 +94,7 @@ struct OnboardingScreenFirst: View {
                 .padding()
                 .font(.custom("Montserrat", size: 18))
                 .foregroundStyle(.white)
-                .fontWeight(.light)
+                .fontWeight(.regular)
             Spacer()
             Button(action: {
                 router.navigate(to: Route.onboarding(Route.OnboardingScreen.second))

@@ -58,7 +58,7 @@ struct OnboardingScreenSeventh : View {
                 VStack(alignment: .leading) {
                     Text("FlightMode collects minimal usage data:")
                         .font(.custom("Montserrat", size: 16))
-                        .fontWeight(.light)
+                        .fontWeight(.regular)
                         .foregroundStyle(.white)
                         .offset(x: geometry.size.width * pow(sin(step), 4))
                     HStack(alignment: .center) {

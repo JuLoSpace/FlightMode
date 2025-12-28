@@ -26,12 +26,35 @@ class UserModel : ObservableObject {
     private var subscriptions: [SubscriptionType: Subscription] = [:]
     private var availableSubscriptions: [SubscriptionType: Bool] = [:]
     private var subscriptionPackages: [SubscriptionType : Package] = [:]
+    @Published private(set) var isPremium: Bool = false
+    
     
     init() {
         initializatePurchases()
     }
     
     func initializatePurchases() {
+        getCustomerInfo()
+        getOfferings()
+    }
+    
+    func getCustomerInfo() {
+        Purchases.shared.getCustomerInfo { (customerInfo, error) in
+            if let info = customerInfo {
+                self.updateCustomerInfo(customerInfo: info)
+            }
+        }
+    }
+    
+    func updateCustomerInfo(customerInfo: CustomerInfo) {
+        if (customerInfo.activeSubscriptions.contains("weekly_sub") || customerInfo.activeSubscriptions.contains("yearly_sub") || customerInfo.activeSubscriptions.contains("monthly_sub")) {
+            isPremium = true
+        } else {
+            isPremium = false
+        }
+    }
+    
+    func getOfferings() {
         Purchases.shared.getOfferings { (offerings, error) in
             if let packages = offerings?.offering(identifier: "premium")?.availablePackages {
                 packages.forEach { pack in
@@ -57,13 +80,17 @@ class UserModel : ObservableObject {
     
     func makePurchase(subscriptionType: SubscriptionType) {
         Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
-            // TODO
+            if let info = customerInfo {
+                self.updateCustomerInfo(customerInfo: info)
+            }
         }
     }
     
     func restorePurchases() {
         Purchases.shared.restorePurchases { customerInfo, error in
-            // TODO
+            if let info = customerInfo {
+                self.updateCustomerInfo(customerInfo: info)
+            }
         }
     }
     

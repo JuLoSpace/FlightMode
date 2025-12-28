@@ -99,7 +99,7 @@ struct OnboardingScreenSecond : View {
                     .padding(.horizontal, 40)
                     .padding(.top, 6)
                     .font(.custom("Montserrat", size: 20))
-                    .fontWeight(.light)
+                    .fontWeight(.regular)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 ZStack {

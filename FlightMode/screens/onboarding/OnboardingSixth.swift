@@ -184,8 +184,10 @@ struct MissionButtonView: View {
     var body: some View {
         if !selectedMissions.contains(mission) {
             Button(action: {
-                selectedMissions.append(mission)
-                contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
+                if (selectedMissions.count < 5) {
+                    selectedMissions.append(mission)
+                    contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
+                }
             }, label: {
                 VStack(alignment: .center) {
                     HStack(alignment: .center) {
@@ -266,7 +268,7 @@ struct OnboardingScreenSixth : View {
             .glassEffect(.regular.tint(Color(hex: selectedMissions.count == 5 ? "FFAE17" : "3D3D3D")).interactive())
         )
         
-        staticContent = PhysicsContent(view: confirmButtonView, startX: 20, startY: height - 80.0, width: width - 40, height: 60)
+        staticContent = PhysicsContent(view: confirmButtonView, startX: 20, startY: height - 60.0, width: width - 40, height: 60)
     }
     
     var body: some View {
@@ -302,7 +304,7 @@ struct OnboardingScreenSixth : View {
                     .padding(.horizontal, 20)
                     Text("Сhoose five missions to begin your flight.")
                         .font(.custom("Montserrat", size: 18))
-                        .fontWeight(.light)
+                        .fontWeight(.regular)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
@@ -335,12 +337,12 @@ struct OnboardingScreenSixth : View {
                                 gradient: Gradient(colors: [
                                     Color(hex: "FFA600").opacity(0.35),
                                     .clear
-                                ]), center: .center, startRadius: 0, endRadius: Double(100 + selectedMissions.count * 50)
+                                ]), center: .center, startRadius: 0, endRadius: Double(100 + selectedMissions.count * 80)
                             )
                         )
-                        .frame(width: 200, height: 200)
-                        .blur(radius: Double(60 + selectedMissions.count * 10))
-                        .offset(x: 100, y: 100)
+                        .frame(width: Double(200 + selectedMissions.count * 16), height: Double(200 + selectedMissions.count * 16))
+                        .blur(radius: Double(60 + selectedMissions.count * 2))
+                        .offset(x: Double(100 + selectedMissions.count * 8), y: Double(100 + selectedMissions.count * 8))
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottomTrailing)
                 PhysicsView(contentToDrop: $contentToDrop, staticContent: $staticContent, onTapMissionCallback: { mission in

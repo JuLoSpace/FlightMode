@@ -44,7 +44,7 @@ struct CardView : View, Animatable {
                 .clipped()
                 .frame(width: width, height: height)
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
         .frame(width: width, height: height)
         .clipped()
     }
