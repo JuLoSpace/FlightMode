@@ -19,12 +19,15 @@ enum SubscriptionType {
 struct Subscription : Hashable {
     var type: SubscriptionType
     var price: String
+    var amount: Double
 }
 
 class UserModel : ObservableObject {
     
     private var subscriptions: [SubscriptionType: Subscription] = [:]
-    private var availableSubscriptions: [SubscriptionType: Bool] = [:]
+    private var promotionalSubscriptions: [SubscriptionType: Subscription] = [:]
+    @Published private(set) var availableSubscriptions: [SubscriptionType: Bool] = [:]
+    @Published private(set) var availablePromotionalSubscriptions: [SubscriptionType: Bool] = [:]
     private var subscriptionPackages: [SubscriptionType : Package] = [:]
     @Published private(set) var isPremium: Bool = false
     
@@ -58,18 +61,36 @@ class UserModel : ObservableObject {
         Purchases.shared.getOfferings { (offerings, error) in
             if let packages = offerings?.offering(identifier: "premium")?.availablePackages {
                 packages.forEach { pack in
+                    if let discount = pack.storeProduct.discounts.first {
+                        Purchases.shared.getPromotionalOffer(forProductDiscount: discount, product: pack.storeProduct) { (promoOffer, error) in
+                            if let offer = promoOffer {
+                                if pack.identifier == "$rc_lifetime" {
+                                    self.promotionalSubscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
+                                    self.availablePromotionalSubscriptions[SubscriptionType.yearly] = true
+                                }
+                                if pack.identifier == "$rc_monthly" {
+                                    self.promotionalSubscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
+                                    self.availablePromotionalSubscriptions[SubscriptionType.monthly] = true
+                                }
+                                if pack.identifier == "$rc_weekly" {
+                                    self.promotionalSubscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
+                                    self.availablePromotionalSubscriptions[SubscriptionType.weekly] = true
+                                }
+                            }
+                        }
+                    }
                     if pack.identifier == "$rc_lifetime" {
-                        self.subscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString)
+                        self.subscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
                         self.availableSubscriptions[SubscriptionType.yearly] = true
                         self.subscriptionPackages[SubscriptionType.yearly] = pack
                     }
                     if pack.identifier == "$rc_monthly" {
-                        self.subscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString)
+                        self.subscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
                         self.availableSubscriptions[SubscriptionType.monthly] = true
                         self.subscriptionPackages[SubscriptionType.monthly] = pack
                     }
                     if pack.identifier == "$rc_weekly" {
-                        self.subscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString)
+                        self.subscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
                         self.availableSubscriptions[SubscriptionType.weekly] = true
                         self.subscriptionPackages[SubscriptionType.weekly] = pack
                     }
@@ -94,11 +115,11 @@ class UserModel : ObservableObject {
         }
     }
     
-    func getAvailableSubscriptions() -> [SubscriptionType: Bool] {
-        return availableSubscriptions
-    }
-    
     func getSubscription(subscriptionType: SubscriptionType) -> Subscription {
         return subscriptions[subscriptionType]!
+    }
+    
+    func getPromotionalSubscription(subscriptionType: SubscriptionType) -> Subscription {
+        return promotionalSubscriptions[subscriptionType]!
     }
 }

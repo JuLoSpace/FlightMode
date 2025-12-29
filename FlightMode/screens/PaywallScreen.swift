@@ -175,7 +175,7 @@ struct PaywallScreen : View {
                 .padding(.top, 10)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
-                        if let exist = user.getAvailableSubscriptions()[SubscriptionType.weekly] {
+                        if let _ = user.availableSubscriptions[SubscriptionType.weekly] {
                             ZStack(alignment: .top) {
                                 HStack(spacing: 0) {
                                     VStack(alignment: .leading) {
@@ -209,7 +209,7 @@ struct PaywallScreen : View {
                                 selectedSubscriptionType = SubscriptionType.weekly
                             }
                         }
-                        if let exist = user.getAvailableSubscriptions()[SubscriptionType.monthly] {
+                        if let _ = user.availableSubscriptions[SubscriptionType.monthly] {
                             ZStack(alignment: .top) {
                                 HStack(spacing: 0) {
                                     VStack(alignment: .leading) {
@@ -267,7 +267,7 @@ struct PaywallScreen : View {
                                 selectedSubscriptionType = SubscriptionType.monthly
                             }
                         }
-                        if let exist = user.getAvailableSubscriptions()[SubscriptionType.yearly] {
+                        if let _ = user.availableSubscriptions[SubscriptionType.yearly] {
                             ZStack(alignment: .top) {
                                 HStack(spacing: 0) {
                                     VStack(alignment: .leading) {
