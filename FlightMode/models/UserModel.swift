@@ -9,6 +9,7 @@
 import Combine
 import RevenueCat
 import Foundation
+import SwiftUI
 
 enum SubscriptionType {
     case weekly
@@ -29,16 +30,18 @@ class UserModel : ObservableObject {
     @Published private(set) var availableSubscriptions: [SubscriptionType: Bool] = [:]
     @Published private(set) var availablePromotionalSubscriptions: [SubscriptionType: Bool] = [:]
     private var subscriptionPackages: [SubscriptionType : Package] = [:]
+    private var subscriptionPromotionalOffers: [SubscriptionType : PromotionalOffer] = [:]
     @Published private(set) var isPremium: Bool = false
     
+    @AppStorage("promotional") var promotional: Date?
     
     init() {
         initializatePurchases()
     }
     
     func initializatePurchases() {
-        getCustomerInfo()
         getOfferings()
+        getCustomerInfo()
     }
     
     func getCustomerInfo() {
@@ -67,14 +70,17 @@ class UserModel : ObservableObject {
                                 if pack.identifier == "$rc_lifetime" {
                                     self.promotionalSubscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
                                     self.availablePromotionalSubscriptions[SubscriptionType.yearly] = true
+                                    self.subscriptionPromotionalOffers[SubscriptionType.yearly] = promoOffer
                                 }
                                 if pack.identifier == "$rc_monthly" {
                                     self.promotionalSubscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
                                     self.availablePromotionalSubscriptions[SubscriptionType.monthly] = true
+                                    self.subscriptionPromotionalOffers[SubscriptionType.monthly] = promoOffer
                                 }
                                 if pack.identifier == "$rc_weekly" {
                                     self.promotionalSubscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: offer.discount.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: offer.discount.price)))
                                     self.availablePromotionalSubscriptions[SubscriptionType.weekly] = true
+                                    self.subscriptionPromotionalOffers[SubscriptionType.weekly] = promoOffer
                                 }
                             }
                         }
@@ -99,10 +105,18 @@ class UserModel : ObservableObject {
         }
     }
     
-    func makePurchase(subscriptionType: SubscriptionType) {
-        Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
-            if let info = customerInfo {
-                self.updateCustomerInfo(customerInfo: info)
+    func makePurchase(subscriptionType: SubscriptionType, isPromotional: Bool = false) {
+        if isPromotional {
+            Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!, promotionalOffer: subscriptionPromotionalOffers[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+                if let info = customerInfo {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
+            }
+        } else {
+            Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+                if let info = customerInfo {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
             }
         }
     }
@@ -121,5 +135,15 @@ class UserModel : ObservableObject {
     
     func getPromotionalSubscription(subscriptionType: SubscriptionType) -> Subscription {
         return promotionalSubscriptions[subscriptionType]!
+    }
+    
+    func seePromotional() {
+        if (promotional == nil) {
+            promotional = Date.now
+        }
+    }
+    
+    func promotionalExist() -> Int {
+        return 3600 * 24 - Int(Date.now.timeIntervalSince(promotional!))
     }
 }

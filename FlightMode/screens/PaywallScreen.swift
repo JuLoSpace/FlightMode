@@ -82,7 +82,7 @@ struct PaywallScreen : View {
                     })
                     Spacer()
                     Button(action: {
-                        router.navigateBack()
+                        router.navigate(to: .promotionalPaywall)
                     }, label: {
                         Image(systemName: "xmark")
                             .padding(.all, 6)
@@ -112,7 +112,7 @@ struct PaywallScreen : View {
                                     .blur(radius: geometry.size.height * 0.08)
                                     .offset(x: geometry.size.height * 0.2, y: geometry.size.height * 0.1)
                             }
-                            .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42, alignment: .bottomTrailing)
+                            .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42, alignment: .bottomTrailing)
                             VStack(alignment: .leading, spacing: 0) {
                                 VStack(alignment: .center) {
                                     if let image = paywallCards[i].image {
@@ -121,7 +121,7 @@ struct PaywallScreen : View {
                                             .aspectRatio(contentMode: .fit)
                                     }
                                 }
-                                .frame(width: geometry.size.width - 60)
+                                .frame(width: max(geometry.size.width - 60, 0))
                                 if let title = paywallCards[i].title {
                                     Text(title)
                                         .font(.custom("Wattauchimma", size: 24))
@@ -140,11 +140,11 @@ struct PaywallScreen : View {
                                 }
                             }
                             .padding(.vertical, 20)
-                            .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
+                            .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
                             .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
                             .padding(.horizontal, 20)
                         }
-                        .frame(width: geometry.size.width - 40, height: geometry.size.height * 0.42)
+                        .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .clipped()
                         .padding(.horizontal, 20)

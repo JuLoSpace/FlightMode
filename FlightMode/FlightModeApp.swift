@@ -33,7 +33,7 @@ struct FlightModeApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                PromotionalPaywallScreen()
+                OnboardingScreenFirst()
                     .navigationDestination(for: Route.self) { route in
                         Group {
                             switch route {
@@ -60,6 +60,8 @@ struct FlightModeApp: App {
                                 }
                             case .paywall:
                                 PaywallScreen()
+                            case .promotionalPaywall:
+                                PromotionalPaywallScreen()
                             }
                         }
                         .navigationBarBackButtonHidden(true)
