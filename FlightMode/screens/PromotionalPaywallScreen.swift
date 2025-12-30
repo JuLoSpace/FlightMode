@@ -12,7 +12,7 @@ struct PromotionalPaywallScreen : View {
     @EnvironmentObject var router: Router
     @EnvironmentObject var user: UserModel
     
-    @State var selectedPromotionalSubscriptionType: SubscriptionType?
+    @State var selectedDiscountSubscription: SubscriptionType?
     
     @State var hours: String = "00"
     @State var minutes: String = "00"
@@ -50,7 +50,7 @@ struct PromotionalPaywallScreen : View {
                         .fontWeight(.regular)
                         .foregroundStyle(.white)
                         .padding(.top, 10)
-                    if user.availablePromotionalSubscriptions[SubscriptionType.weekly] ?? false && user.availableSubscriptions[SubscriptionType.weekly] ?? false {
+                    if user.availableSubscriptions[SubscriptionType.weekly] ?? false && user.discountAvailableSubscriptions[SubscriptionType.weekly] ?? false {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
                                 Text("Weekly")
@@ -58,7 +58,7 @@ struct PromotionalPaywallScreen : View {
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text("Save \(100 - Int(100.0 * user.getPromotionalSubscription(subscriptionType: .weekly).amount / user.getSubscription(subscriptionType: .weekly).amount))%")
+                                Text("Save \(100 - Int(100.0 * user.getDiscountSubscription(subscriptionType: .weekly).amount / user.getSubscription(subscriptionType: .weekly).amount))%")
                                     .font(.custom("Montserrat", size: 16))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "39383A"))
@@ -76,7 +76,7 @@ struct PromotionalPaywallScreen : View {
                                     .font(.custom("Montserrat", size: 20))
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
-                                Text("\(user.getPromotionalSubscription(subscriptionType: .weekly).price) / week")
+                                Text("\(user.getDiscountSubscription(subscriptionType: .weekly).price) / week")
                                     .font(.custom("Montserrat", size: 18))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "FFAE17"))
@@ -89,16 +89,16 @@ struct PromotionalPaywallScreen : View {
                         .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
-                            if selectedPromotionalSubscriptionType == .weekly {
+                            if selectedDiscountSubscription == .weekly {
                                 RoundedRectangle(cornerRadius: 16).stroke(Color(hex: "FFAE17"), lineWidth: 2)
                             }
                         }
                         .padding(.top, 20)
                         .onTapGesture {
-                            selectedPromotionalSubscriptionType = .weekly
+                            selectedDiscountSubscription = .weekly
                         }
                     }
-                    if user.availablePromotionalSubscriptions[SubscriptionType.monthly] ?? false && user.availableSubscriptions[SubscriptionType.monthly] ?? false {
+                    if user.discountAvailableSubscriptions[SubscriptionType.monthly] ?? false && user.availableSubscriptions[SubscriptionType.monthly] ?? false {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
                                 Text("Monthly - Best value")
@@ -106,7 +106,7 @@ struct PromotionalPaywallScreen : View {
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text("Save \(100 - Int(100.0 * user.getPromotionalSubscription(subscriptionType: .monthly).amount / user.getSubscription(subscriptionType: .monthly).amount))%")
+                                Text("Save \(100 - Int(100.0 * user.getDiscountSubscription(subscriptionType: .monthly).amount / user.getSubscription(subscriptionType: .monthly).amount))%")
                                     .font(.custom("Montserrat", size: 16))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "39383A"))
@@ -124,7 +124,7 @@ struct PromotionalPaywallScreen : View {
                                     .font(.custom("Montserrat", size: 20))
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
-                                Text("\(user.getPromotionalSubscription(subscriptionType: .monthly).price) / month")
+                                Text("\(user.getDiscountSubscription(subscriptionType: .monthly).price) / month")
                                     .font(.custom("Montserrat", size: 18))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "FFAE17"))
@@ -137,16 +137,16 @@ struct PromotionalPaywallScreen : View {
                         .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
-                            if selectedPromotionalSubscriptionType == .monthly {
+                            if selectedDiscountSubscription == .monthly {
                                 RoundedRectangle(cornerRadius: 16).stroke(Color(hex: "FFAE17"), lineWidth: 2)
                             }
                         }
                         .padding(.top, 20)
                         .onTapGesture {
-                            selectedPromotionalSubscriptionType = .monthly
+                            selectedDiscountSubscription = .monthly
                         }
                     }
-                    if user.availablePromotionalSubscriptions[SubscriptionType.yearly] ?? false && user.availableSubscriptions[SubscriptionType.yearly] ?? false {
+                    if user.discountAvailableSubscriptions[SubscriptionType.yearly] ?? false && user.availableSubscriptions[SubscriptionType.yearly] ?? false {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
                                 Text("Yearly - Max savings")
@@ -154,7 +154,7 @@ struct PromotionalPaywallScreen : View {
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
                                 Spacer()
-                                Text("Save \(100 - Int(100.0 * user.getPromotionalSubscription(subscriptionType: .yearly).amount / user.getSubscription(subscriptionType: .yearly).amount))%")
+                                Text("Save \(100 - Int(100.0 * user.getDiscountSubscription(subscriptionType: .yearly).amount / user.getSubscription(subscriptionType: .yearly).amount))%")
                                     .font(.custom("Montserrat", size: 16))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "39383A"))
@@ -172,7 +172,7 @@ struct PromotionalPaywallScreen : View {
                                     .font(.custom("Montserrat", size: 20))
                                     .fontWeight(.bold)
                                     .foregroundStyle(.white)
-                                Text("\(user.getPromotionalSubscription(subscriptionType: .yearly).price) / year")
+                                Text("\(user.getDiscountSubscription(subscriptionType: .yearly).price) / year")
                                     .font(.custom("Montserrat", size: 18))
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color(hex: "FFAE17"))
@@ -185,13 +185,13 @@ struct PromotionalPaywallScreen : View {
                         .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
-                            if selectedPromotionalSubscriptionType == .yearly {
+                            if selectedDiscountSubscription == .yearly {
                                 RoundedRectangle(cornerRadius: 16).stroke(Color(hex: "FFAE17"), lineWidth: 2)
                             }
                         }
                         .padding(.top, 20)
                         .onTapGesture {
-                            selectedPromotionalSubscriptionType = .yearly
+                            selectedDiscountSubscription = .yearly
                         }
                     }
                     HStack {
@@ -232,12 +232,12 @@ struct PromotionalPaywallScreen : View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
                 .frame(width: max(geometry.size.width - 40, 0), alignment: .topLeading)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal, 20)
                 Spacer()
                 Button(action: {
-                    if let type = selectedPromotionalSubscriptionType {
-                        user.makePurchase(subscriptionType: type, isPromotional: true)
+                    if let type = selectedDiscountSubscription {
+                        user.makePurchase(subscriptionType: type)
                     }
                 }, label: {
                     Text("🚀 Claim Discount")
@@ -247,7 +247,7 @@ struct PromotionalPaywallScreen : View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 60)
                 })
-                .glassEffect(.clear.tint(Color(hex: selectedPromotionalSubscriptionType != nil ? "FFAE17" : "3D3D3D")).interactive())
+                .glassEffect(.clear.tint(Color(hex: selectedDiscountSubscription != nil ? "FFAE17" : "3D3D3D")).interactive())
                 .padding(.horizontal, 20)
                 .padding(.bottom, 10)
                 Button(action: {
@@ -264,7 +264,7 @@ struct PromotionalPaywallScreen : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(hex: "0E0E0E"))
         .onAppear {
-            user.seePromotional()
+            user.seeDiscount()
             timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                 let seconds: Int = user.promotionalExist()
