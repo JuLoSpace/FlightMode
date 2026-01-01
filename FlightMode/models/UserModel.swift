@@ -102,10 +102,18 @@ class UserModel : ObservableObject {
         }
     }
     
-    func makePurchase(subscriptionType: SubscriptionType) {
-        Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
-            if let info = customerInfo {
-                self.updateCustomerInfo(customerInfo: info)
+    func makePurchase(subscriptionType: SubscriptionType, isDiscount: Bool = false) {
+        if (!isDiscount) {
+            Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+                if let info = customerInfo {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
+            }
+        } else {
+            Purchases.shared.purchase(package: discountSubscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+                if let info = customerInfo {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
             }
         }
     }

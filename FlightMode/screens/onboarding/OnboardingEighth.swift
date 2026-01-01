@@ -18,16 +18,26 @@ struct OnboardingScreenEighth : View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                Button(action: {
-                    router.navigateBack()
-                }, label: {
-                    Image(systemName: "chevron.backward")
-                        .padding(.all, 6)
-                })
-                .buttonBorderShape(.circle)
-                .buttonStyle(GlassButtonStyle())
-                .font(.system(size: 24))
-                .padding(.top, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(GlassButtonStyle())
+                } else {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .foregroundStyle(.white)
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.bordered)
+                }
                 HStack {
                     Text("WHEN SHOULD WE REMIND YOU ABOUT YOUR")
                         .font(.custom("Wattauchimma", size: 44))
@@ -138,28 +148,68 @@ struct OnboardingScreenEighth : View {
                     .sensoryFeedback(.impact(weight: .heavy), trigger: Int(hoursAngle / 15))
                     .sensoryFeedback(.impact(weight: .medium), trigger: Int(minutesAngle / 15))
                     HStack {
-                        Button(action: {
-                            router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
-                        }, label: {
-                            Text("Got it!")
-                                .font(.system(size: 20))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                        })
-                        .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
-                        Button(action: {
-                            router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
-                        }, label: {
-                            Text("Skip")
-                                .font(.system(size: 20))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 54)
-                        })
-                        .glassEffect(.regular.tint(Color(hex: "3D3D3D")).interactive())
+//                        Button(action: {
+//                            router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
+//                        }, label: {
+//                            Text("Got it!")
+//                                .font(.system(size: 20))
+//                                .fontWeight(.bold)
+//                                .foregroundStyle(.white)
+//                            .frame(maxWidth: .infinity)
+//                            .frame(height: 54)
+//                        })
+//                        .adaptiveGlassEffect()
+//                        .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                        if #available(iOS 26, *) {
+                            Button(action: {
+                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
+                            }, label: {
+                                Text("Got it!")
+                                    .font(.custom("Montserrat", size: 20))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                            })
+                            .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                        } else {
+                            Button(action: {
+                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
+                            }, label: {
+                                Text("🫡 Got it!")
+                                    .font(.custom("Montserrat", size: 20))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                            })
+                            .buttonStyle(CustomButtonStyle(color: Color(hex: "FFAE17").opacity(0.7)))
+                        }
+                        if #available(iOS 26, *) {
+                            Button(action: {
+                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
+                            }, label: {
+                                Text("Skip")
+                                    .font(.custom("Montserrat", size: 20))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                            })
+                            .glassEffect(.regular.tint(Color(hex: "3D3D3D")).interactive())
+                        } else {
+                            Button(action: {
+                                router.navigate(to: Route.onboarding(Route.OnboardingScreen.nineth))
+                            }, label: {
+                                Text("Skip")
+                                    .font(.custom("Montserrat", size: 20))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                            })
+                            .buttonStyle(CustomButtonStyle(color: Color(hex: "3D3D3D").opacity(0.7)))
+                        }
                     }
                 }
             }

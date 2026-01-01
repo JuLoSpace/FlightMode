@@ -183,28 +183,59 @@ struct MissionButtonView: View {
     
     var body: some View {
         if !selectedMissions.contains(mission) {
-            Button(action: {
-                if (selectedMissions.count < 5) {
-                    selectedMissions.append(mission)
-                    contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
-                }
-            }, label: {
-                VStack(alignment: .center) {
-                    HStack(alignment: .center) {
-                        Text(mission.emoji)
-                            .font(.custom("Montserrat", size: 14))
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white)
-                        Text(mission.name)
-                            .font(.custom("Montserrat", size: 14))
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white)
+            if #available(iOS 26, *) {
+                Button(action: {
+                    if (selectedMissions.count < 5) {
+                        selectedMissions.append(mission)
+                        contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
                     }
-                }
-                .padding(.all, 20)
-            })
-            .frame(width: width, height: height, alignment: .center)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: height / 2))
+                }, label: {
+                    VStack(alignment: .center) {
+                        HStack(alignment: .center) {
+                            Text(mission.emoji)
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                            Text(mission.name)
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .padding(.all, 20)
+                })
+                .frame(width: width, height: height, alignment: .center)
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: height / 2))
+            } else {
+                Button(action: {
+                    if (selectedMissions.count < 5) {
+                        selectedMissions.append(mission)
+                        contentToDrop = PhysicsContent(view: AnyView(self), startX: startX, startY: startY, width: width, height: height, mission: mission)
+                    }
+                }, label: {
+                    VStack(alignment: .center) {
+                        HStack(alignment: .center) {
+                            Text(mission.emoji)
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                            Text(mission.name)
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .padding(.all, 20)
+                })
+                .frame(width: width, height: height, alignment: .center)
+                .background(Color(hex: "0E0E0E").opacity(0.8))
+                .background(LinearGradient(gradient: Gradient(colors: [
+                    Color(hex: "EBF0FF").opacity(0.6),
+                    Color(hex: "C8CCFF").opacity(0.5),
+                    Color(hex: "D9D7FF").opacity(0.4),
+                ]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                .cornerRadius(height / 2)
+            }
         } else {
             ZStack {
                 Color(hex: "FFAE17")
@@ -251,22 +282,41 @@ struct OnboardingScreenSixth : View {
     @State private var confirmButtonView: AnyView?
     
     private func updateConfirmButton(height: Double, width: Double) {
-        confirmButtonView = AnyView(
-            Button(action: {
-                if selectedMissions.count == 5 {
-                    router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
-                }
-            }, label: {
-                Text("Confirm")
-                    .font(.custom("Montserrat", size: 20))
-                    .fontWeight(.bold)
-                    .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 60)
-            })
-            .contentShape(.rect)
-            .glassEffect(.regular.tint(Color(hex: selectedMissions.count == 5 ? "FFAE17" : "3D3D3D")).interactive())
-        )
+        
+        if #available(iOS 26, *) {
+            confirmButtonView = AnyView(
+                Button(action: {
+                    if selectedMissions.count == 5 {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
+                    }
+                }, label: {
+                    Text("Confirm")
+                        .font(.custom("Montserrat", size: 20))
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+                })
+                .contentShape(.rect)
+                .glassEffect(.regular.tint(Color(hex: selectedMissions.count == 5 ? "FFAE17" : "3D3D3D")).interactive())
+            )
+        } else {
+            confirmButtonView = AnyView(
+                Button(action: {
+                    if selectedMissions.count == 5 {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
+                    }
+                }, label: {
+                    Text("Confirm")
+                        .font(.custom("Montserrat", size: 20))
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+                })
+                .buttonStyle(CustomButtonStyle(color: Color(hex: selectedMissions.count == 5 ? "FFAE17" : "3D3D3D").opacity(0.7)))
+                )
+        }
         
         staticContent = PhysicsContent(view: confirmButtonView, startX: 20, startY: height - 60.0, width: width - 40, height: 60)
     }
@@ -275,17 +325,28 @@ struct OnboardingScreenSixth : View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Button(action: {
-                        router.navigateBack()
-                    }, label: {
-                        Image(systemName: "chevron.backward")
-                            .padding(.all, 6)
-                    })
-                    .buttonBorderShape(.circle)
-                    .buttonStyle(GlassButtonStyle())
-                    .font(.system(size: 24))
-                    .padding(.top, 20)
-                    .padding(.horizontal, 20)
+                    if #available(iOS 26, *) {
+                        Button(action: {
+                            router.navigateBack()
+                        }, label: {
+                            Image(systemName: "chevron.backward")
+                                .padding(.all, 6)
+                        })
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(GlassButtonStyle())
+                        .padding(.horizontal, 20)
+                    } else {
+                        Button(action: {
+                            router.navigateBack()
+                        }, label: {
+                            Image(systemName: "chevron.backward")
+                                .padding(.all, 6)
+                        })
+                        .foregroundStyle(.white)
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(.bordered)
+                        .padding(.horizontal, 20)
+                    }
                     HStack {
                         Text("SELECT YOUR")
                             .font(.custom("Wattauchimma", size: 44))

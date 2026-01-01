@@ -33,7 +33,7 @@ struct FlightModeApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                OnboardingScreenFirst()
+                HomeScreen()
                     .navigationDestination(for: Route.self) { route in
                         Group {
                             switch route {
@@ -67,6 +67,8 @@ struct FlightModeApp: App {
                         .navigationBarBackButtonHidden(true)
                         .interactiveDismissDisabled(false)
                     }
+                    .navigationBarHidden(true)
+//                    .accessibilityHidden(true)
             }
             .environmentObject(router)
             .environmentObject(user)

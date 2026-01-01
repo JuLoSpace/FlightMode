@@ -57,22 +57,36 @@ struct OnboardingScreenFifth: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading, spacing: 0) {
-                Button(action: {
-                    router.navigateBack()
-                }, label: {
-                    Image(systemName: "chevron.backward")
-                        .padding(.all, 6)
-                })
-                .buttonBorderShape(.circle)
-                .buttonStyle(GlassButtonStyle())
-                .font(.system(size: 24))
-                .padding(.top, 20)
-                .padding(.horizontal, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(GlassButtonStyle())
+                    .animation(nil, value: step)
+                    .padding(.horizontal, 20)
+                } else {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .foregroundStyle(.white)
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.bordered)
+                    .animation(nil, value: step)
+                    .padding(.horizontal, 20)
+                }
                 HStack {
                     Text("YOUR PILOT")
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
+                        .animation(nil, value: step)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -81,6 +95,7 @@ struct OnboardingScreenFifth: View {
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
+                        .animation(nil, value: step)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -89,6 +104,7 @@ struct OnboardingScreenFifth: View {
                     .font(.custom("Montserrat", size: 16))
                     .fontWeight(.regular)
                     .foregroundStyle(.white)
+                    .animation(nil, value: step)
                 ForEach(Career.allCases, id: \.self) { career in
                     CareerCard(image: career.imageName, name: career.name, flights: career.flights, width: geometry.size.width - 40, height: 60)
                         .padding(.horizontal, 20)
@@ -96,18 +112,35 @@ struct OnboardingScreenFifth: View {
                         .animation(.easeInOut(duration: 0.8).delay(Double(career.index) * 0.05), value: step)
                 }
                 Spacer()
-                Button(action: {
-                    router.navigate(to: Route.onboarding(Route.OnboardingScreen.sixth))
-                }, label: {
-                    Text("🚀 Let’s climb")
-                        .font(.custom("Montserrat", size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                })
-                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
-                .padding(.horizontal, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.sixth))
+                    }, label: {
+                        Text("🚀 Let’s climb ")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                    .padding(.horizontal, 20)
+                    .animation(nil, value: step)
+                } else {
+                    Button(action: {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.sixth))
+                    }, label: {
+                        Text("🚀 Let’s climb ")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .buttonStyle(CustomButtonStyle(color: Color(hex: "FFAE17").opacity(0.7)))
+                    .padding(.horizontal, 20)
+                    .animation(nil, value: step)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

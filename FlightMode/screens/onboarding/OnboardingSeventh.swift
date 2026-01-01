@@ -15,21 +15,34 @@ struct OnboardingScreenSeventh : View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                Button(action: {
-                    router.navigateBack()
-                }, label: {
-                    Image(systemName: "chevron.backward")
-                        .padding(.all, 6)
-                })
-                .buttonBorderShape(.circle)
-                .buttonStyle(GlassButtonStyle())
-                .font(.system(size: 24))
-                .padding(.top, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(GlassButtonStyle())
+                    .animation(nil, value: step)
+                } else {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .foregroundStyle(.white)
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.bordered)
+                    .animation(nil, value: step)
+                }
                 HStack {
                     Text("YOUR DATA,")
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
+                        .animation(nil, value: step)
                     Spacer()
                 }
                 HStack {
@@ -37,22 +50,43 @@ struct OnboardingScreenSeventh : View {
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
+                        .animation(nil, value: step)
                 }
                 VStack {
-                    GlassEffectContainer {
-                        HStack {
-                            Image("onboarding_7_1")
-                            Text("We never collect personal files, photos, messages, contacts, or anything unrelated to your focus sessions. You can change your preferences anytime in Settings.")
-                                .font(.custom("Montserrat", size: 14))
-                                .foregroundStyle(.white)
-                                .padding(.leading, 15)
+                    if #available(iOS 26, *) {
+                        GlassEffectContainer {
+                            HStack {
+                                Image("onboarding_7_1")
+                                Text("We never collect personal files, photos, messages, contacts, or anything unrelated to your focus sessions. You can change your preferences anytime in Settings.")
+                                    .font(.custom("Montserrat", size: 14))
+                                    .foregroundStyle(.white)
+                                    .padding(.leading, 15)
+                            }
                         }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 15)
-                    .frame(width: geometry.size.width - 40)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 20).stroke(.white.opacity(0.15), lineWidth: 1)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 15)
+                        .frame(width: geometry.size.width - 40)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20).stroke(.white.opacity(0.15), lineWidth: 1)
+                        }
+                        .animation(nil, value: step)
+                    } else {
+                        VStack {
+                            HStack {
+                                Image("onboarding_7_1")
+                                Text("We never collect personal files, photos, messages, contacts, or anything unrelated to your focus sessions. You can change your preferences anytime in Settings.")
+                                    .font(.custom("Montserrat", size: 14))
+                                    .foregroundStyle(.white)
+                                    .padding(.leading, 15)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 15)
+                        .frame(width: geometry.size.width - 40)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20).stroke(.white.opacity(0.15), lineWidth: 1)
+                        }
+                        .animation(nil, value: step)
                     }
                 }
                 VStack(alignment: .leading) {
@@ -110,18 +144,33 @@ struct OnboardingScreenSeventh : View {
                 }
                 .padding(.top, 10)
                 Spacer()
-                Button(action: {
-                    router.navigate(to: Route.onboarding(Route.OnboardingScreen.eighth))
-                }, label: {
-                    Text("Got it!")
-                        .font(.custom("Montserrat", size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                })
-                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
-                .padding(.horizontal, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.eighth))
+                    }, label: {
+                        Text("Got it!")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                    .animation(nil, value: step)
+                } else {
+                    Button(action: {
+                        router.navigate(to: Route.onboarding(Route.OnboardingScreen.eighth))
+                    }, label: {
+                        Text("Got it!")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .buttonStyle(CustomButtonStyle(color: Color(hex: "FFAE17").opacity(0.7)))
+                    .animation(nil, value: step)
+                }
             }
             .padding(.horizontal, 20)
         }

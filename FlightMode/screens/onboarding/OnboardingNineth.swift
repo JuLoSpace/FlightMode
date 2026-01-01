@@ -56,21 +56,34 @@ struct OnboardingScreenNineth : View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                Button(action: {
-                    router.navigateBack()
-                }, label: {
-                    Image(systemName: "chevron.backward")
-                        .padding(.all, 6)
-                })
-                .buttonBorderShape(.circle)
-                .buttonStyle(GlassButtonStyle())
-                .font(.system(size: 24))
-                .padding(.top, 20)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(GlassButtonStyle())
+                    .animation(nil, value: step)
+                } else {
+                    Button(action: {
+                        router.navigateBack()
+                    }, label: {
+                        Image(systemName: "chevron.backward")
+                            .padding(.all, 6)
+                    })
+                    .foregroundStyle(.white)
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.bordered)
+                    .animation(nil, value: step)
+                }
                 HStack {
                     Text("READY FOR YOUR")
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
+                        .animation(nil, value: step)
                     Spacer()
                 }
                 HStack {
@@ -78,6 +91,7 @@ struct OnboardingScreenNineth : View {
                         .font(.custom("Wattauchimma", size: 44))
                         .fontWeight(.bold)
                         .foregroundStyle(Color(hex: "FFAE17"))
+                        .animation(nil, value: step)
                 }
                 HStack {
                     Text("Cadet")
@@ -144,24 +158,47 @@ struct OnboardingScreenNineth : View {
                 }
                 .offset(x: -geometry.size.width * pow(sin(step1), 1))
                 Spacer()
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 1)) {
-                        step1 = 0
-                    }
-                    Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
-                        router.navigate(to: Route.paywall)
-                    }
-                }, label: {
-                    Text("🚀 Ready for Takeoff!")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                })
-                .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
-                .padding(.horizontal, 20)
-                .offset(y: geometry.size.height * cos(step1))
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 1)) {
+                            step1 = 0
+                        }
+                        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                            router.navigate(to: Route.paywall)
+                        }
+                    }, label: {
+                        Text("🚀 Ready for Takeoff!")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                    .padding(.horizontal, 20)
+                    .offset(y: geometry.size.height * cos(step1))
+                    .animation(nil, value: step)
+                } else {
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 1)) {
+                            step1 = 0
+                        }
+                        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
+                            router.navigate(to: Route.paywall)
+                        }
+                    }, label: {
+                        Text("🚀 Ready for Takeoff!")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .buttonStyle(CustomButtonStyle(color: Color(hex: "FFAE17").opacity(0.7)))
+                    .padding(.horizontal, 20)
+                    .offset(y: geometry.size.height * cos(step1))
+                    .animation(nil, value: step)
+                }
             }
             .padding(.horizontal, 20)
         }

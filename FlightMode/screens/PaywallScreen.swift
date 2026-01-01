@@ -81,17 +81,27 @@ struct PaywallScreen : View {
                             .background(.clear)
                     })
                     Spacer()
-                    Button(action: {
-                        router.navigate(to: .promotionalPaywall)
-                    }, label: {
-                        Image(systemName: "xmark")
-                            .padding(.all, 6)
-                    })
-                    .buttonBorderShape(.circle)
-                    .buttonStyle(GlassButtonStyle())
-                    .font(.system(size: 24))
+                    if #available(iOS 26, *) {
+                        Button(action: {
+                            router.navigate(to: .promotionalPaywall)
+                        }, label: {
+                            Image(systemName: "xmark")
+                                .padding(.all, 6)
+                        })
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(GlassButtonStyle())
+                    } else {
+                        Button(action: {
+                            router.navigate(to: .promotionalPaywall)
+                        }, label: {
+                            Image(systemName: "xmark")
+                                .padding(.all, 6)
+                        })
+                        .foregroundStyle(.white)
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(.bordered)
+                    }
                 }
-                .padding(.top, 20)
                 .padding(.horizontal, 20)
                 Text("PREMIUM ACCESS")
                     .font(.custom("Wattauchimma", size: 44))
@@ -105,7 +115,7 @@ struct PaywallScreen : View {
                                     .fill(
                                         RadialGradient(
                                             gradient: Gradient(colors: [
-                                                Color(hex: "FFA600").opacity(0.35),
+                                                Color(hex: "FFA600").opacity(0.55),
                                                 .clear
                                             ]), center: .center, startRadius: 0, endRadius: geometry.size.height * 0.2)
                                     )
@@ -113,36 +123,74 @@ struct PaywallScreen : View {
                                     .offset(x: geometry.size.height * 0.2, y: geometry.size.height * 0.1)
                             }
                             .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42, alignment: .bottomTrailing)
-                            VStack(alignment: .leading, spacing: 0) {
-                                VStack(alignment: .center) {
-                                    if let image = paywallCards[i].image {
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
+                            if #available(iOS 26, *) {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    VStack(alignment: .center) {
+                                        if let image = paywallCards[i].image {
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                        }
+                                    }
+                                    .frame(width: max(geometry.size.width - 60, 0))
+                                    if let title = paywallCards[i].title {
+                                        Text(title)
+                                            .font(.custom("Wattauchimma", size: 24))
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
+                                    }
+                                    if let description = paywallCards[i].description {
+                                        Text(description)
+                                            .font(.custom("Montserrat", size: 16))
+                                            .fontWeight(.light)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
                                     }
                                 }
-                                .frame(width: max(geometry.size.width - 60, 0))
-                                if let title = paywallCards[i].title {
-                                    Text(title)
-                                        .font(.custom("Wattauchimma", size: 24))
-                                        .fontWeight(.bold)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 10)
+                                .padding(.vertical, 20)
+                                .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
+                                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                                .padding(.horizontal, 20)
+                            } else {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    VStack(alignment: .center) {
+                                        if let image = paywallCards[i].image {
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                        }
+                                    }
+                                    .frame(width: max(geometry.size.width - 60, 0))
+                                    if let title = paywallCards[i].title {
+                                        Text(title)
+                                            .font(.custom("Wattauchimma", size: 24))
+                                            .fontWeight(.bold)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
+                                    }
+                                    if let description = paywallCards[i].description {
+                                        Text(description)
+                                            .font(.custom("Montserrat", size: 16))
+                                            .fontWeight(.light)
+                                            .foregroundStyle(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.top, 10)
+                                    }
                                 }
-                                if let description = paywallCards[i].description {
-                                    Text(description)
-                                        .font(.custom("Montserrat", size: 16))
-                                        .fontWeight(.light)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 20)
-                                        .padding(.top, 10)
-                                }
+                                .padding(.vertical, 20)
+                                .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
+                                .background(Color(hex: "0E0E0E").opacity(0.8))
+                                .background(LinearGradient(gradient: Gradient(colors: [
+                                    Color(hex: "EBF0FF").opacity(0.6),
+                                    Color(hex: "C8CCFF").opacity(0.5),
+                                    Color(hex: "D9D7FF").opacity(0.4),
+                                ]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .padding(.horizontal, 20)
                             }
-                            .padding(.vertical, 20)
-                            .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
-                            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
-                            .padding(.horizontal, 20)
                         }
                         .frame(width: max(geometry.size.width - 40, 0), height: geometry.size.height * 0.42)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -318,21 +366,39 @@ struct PaywallScreen : View {
                 }
                 .padding(.top, 10)
                 Spacer()
-                Button(action: {
-                    if let type = selectedSubscriptionType {
-                        user.makePurchase(subscriptionType: type)
-                    }
-                }, label: {
-                    Text("🚀 Start 3-Day Free Trial")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                })
-                .glassEffect(.clear.tint(selectedSubscriptionType != nil ? Color(hex: "FFAE17") : Color(hex: "3D3D3D")).interactive())
-                .padding(.horizontal, 20)
-                .padding(.bottom, 10)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        if let type = selectedSubscriptionType {
+                            user.makePurchase(subscriptionType: type)
+                        }
+                    }, label: {
+                        Text("🚀 Start 3-Day Free Trial")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .glassEffect(.regular.tint(selectedSubscriptionType != nil ? Color(hex: "FFAE17") : Color(hex: "3D3D3D")).interactive())
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+                } else {
+                    Button(action: {
+                        if let type = selectedSubscriptionType {
+                            user.makePurchase(subscriptionType: type)
+                        }
+                    }, label: {
+                        Text("🚀 Start 3-Day Free Trial")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .buttonStyle(CustomButtonStyle(color: (selectedSubscriptionType != nil ? Color(hex: "FFAE17") : Color(hex: "3D3D3D")).opacity(0.7)))
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+                }
                 HStack(alignment: .center) {
                     Button(action: {
                         

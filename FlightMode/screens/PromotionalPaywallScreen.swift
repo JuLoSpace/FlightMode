@@ -23,7 +23,7 @@ struct PromotionalPaywallScreen : View {
         GeometryReader { geometry in
             VStack {
                 Spacer()
-                VStack(alignment: .leading, spacing: 0) {
+                let v = VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .center) {
                         Text("WAIT, ")
                             .font(.custom("Wattauchimma", size: 44))
@@ -35,15 +35,28 @@ struct PromotionalPaywallScreen : View {
                             .fontWeight(.bold)
                             .foregroundStyle(Color(hex: "FFAE17"))
                         Spacer()
-                        Button(action: {
-                            router.navigateBack()
-                        }, label: {
-                            Image(systemName: "xmark")
-                                .padding(.all, 6)
-                        })
-                        .buttonBorderShape(.circle)
-                        .buttonStyle(GlassButtonStyle())
-                        .font(.system(size: 24))
+                        if #available(iOS 26, *) {
+                            Button(action: {
+                                router.navigateBack()
+                            }, label: {
+                                Image(systemName: "xmark")
+                                    .padding(.all, 6)
+                            })
+                            .buttonBorderShape(.circle)
+                            .buttonStyle(GlassButtonStyle())
+                            .font(.system(size: 24))
+                        } else {
+                            Button(action: {
+                                router.navigateBack()
+                            }, label: {
+                                Image(systemName: "xmark")
+                                    .padding(.all, 6)
+                            })
+                            .foregroundStyle(.white)
+                            .buttonBorderShape(.circle)
+                            .buttonStyle(.bordered)
+                            .font(.system(size: 24))
+                        }
                     }
                     Text("Special Offer Just Unlocked. As a first-time pilot, you get exclusive discounted pricing:")
                         .font(.custom("Montserrat", size: 16))
@@ -86,7 +99,7 @@ struct PromotionalPaywallScreen : View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 20)
                         .frame(width: max(geometry.size.width - 80, 0), alignment: .topLeading)
-                        .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
+                        .adaptiveGlassEffect(color: Color.white.opacity(0.2), shape: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
                             if selectedDiscountSubscription == .weekly {
@@ -134,7 +147,7 @@ struct PromotionalPaywallScreen : View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 20)
                         .frame(width: max(geometry.size.width - 80, 0), alignment: .topLeading)
-                        .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
+                        .adaptiveGlassEffect(color: Color.white.opacity(0.2), shape: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
                             if selectedDiscountSubscription == .monthly {
@@ -182,7 +195,7 @@ struct PromotionalPaywallScreen : View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 20)
                         .frame(width: max(geometry.size.width - 80, 0), alignment: .topLeading)
-                        .glassEffect(.regular.tint(Color.white.opacity(0.2)), in: RoundedRectangle(cornerRadius: 16))
+                        .adaptiveGlassEffect(color: Color.white.opacity(0.2), shape: RoundedRectangle(cornerRadius: 16))
                         .contentShape(.rect)
                         .overlay {
                             if selectedDiscountSubscription == .yearly {
@@ -232,24 +245,55 @@ struct PromotionalPaywallScreen : View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
                 .frame(width: max(geometry.size.width - 40, 0), alignment: .topLeading)
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
-                .padding(.horizontal, 20)
+                if #available(iOS 26, *) {
+                    v
+                        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                        .padding(.horizontal, 20)
+                } else {
+                    v
+                        .background(Color(hex: "0E0E0E").opacity(0.8))
+                        .background(LinearGradient(gradient: Gradient(colors: [
+                            Color(hex: "EBF0FF").opacity(0.6),
+                            Color(hex: "C8CCFF").opacity(0.5),
+                            Color(hex: "D9D7FF").opacity(0.4),
+                        ]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .cornerRadius(16)
+                        .padding(.horizontal, 20)
+                }
                 Spacer()
-                Button(action: {
-                    if let type = selectedDiscountSubscription {
-                        user.makePurchase(subscriptionType: type)
-                    }
-                }, label: {
-                    Text("🚀 Claim Discount")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                })
-                .glassEffect(.clear.tint(Color(hex: selectedDiscountSubscription != nil ? "FFAE17" : "3D3D3D")).interactive())
-                .padding(.horizontal, 20)
-                .padding(.bottom, 10)
+                if #available(iOS 26, *) {
+                    Button(action: {
+                        if let type = selectedDiscountSubscription {
+                            user.makePurchase(subscriptionType: type, isDiscount: true)
+                        }
+                    }, label: {
+                        Text("🚀 Claim Discount")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .glassEffect(.regular.tint(Color(hex: selectedDiscountSubscription != nil ? "FFAE17" : "3D3D3D")).interactive())
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+                } else {
+                    Button(action: {
+                        if let type = selectedDiscountSubscription {
+                            user.makePurchase(subscriptionType: type, isDiscount: true)
+                        }
+                    }, label: {
+                        Text("🚀 Claim Discount")
+                            .font(.custom("Montserrat", size: 20))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 60)
+                    })
+                    .buttonStyle(CustomButtonStyle(color: (Color(hex: selectedDiscountSubscription != nil ? "FFAE17" : "3D3D3D")).opacity(0.7)))
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10)
+                }
                 Button(action: {
                     
                 }, label: {
