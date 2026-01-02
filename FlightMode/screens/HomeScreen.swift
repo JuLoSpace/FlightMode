@@ -232,7 +232,7 @@ struct HomeScreen : View {
                 VStack {
                     ZStack(alignment: .top) {
                         tabWidgets[currentTab]
-                            .padding(.vertical, 20)
+                            .padding(.vertical, 30)
                             .frame(width: geometry.size.width, height: tabHeight)
                             .background(Color(hex: "2F2F2F").opacity(0.75))
                             .clipShape(currentTabShape)

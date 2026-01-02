@@ -72,3 +72,9 @@ struct HomeTab : View {
         }
     }
 }
+
+#Preview {
+    HomeTab { _ in
+        
+    }
+}
