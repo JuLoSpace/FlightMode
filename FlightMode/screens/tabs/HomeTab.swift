@@ -11,12 +11,14 @@ struct HomeTab : View {
     
     var onTabCallback: (TabWidgetType) -> ()
     
+    @EnvironmentObject var locationService: LocationService
+    
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .center) {
                 if #available(iOS 26, *) {
                     Button(action: {
-    //                    onTabCallback()
+                        onTabCallback(TabWidgetType.flight(locationService.location == nil ? FlightWidgetType.setLocation : FlightWidgetType.selectAirport))
                     }, label: {
                         Text("Start flight")
                             .font(.custom("Montserrat", size: 20))

@@ -30,6 +30,7 @@ struct FlightModeApp: App {
     @StateObject private var router = Router()
     @StateObject private var user = UserModel()
     @StateObject private var airportsService = AirportsService()
+    @StateObject private var locationService = LocationService()
     
     var body: some Scene {
         WindowGroup {
@@ -74,6 +75,7 @@ struct FlightModeApp: App {
             .environmentObject(router)
             .environmentObject(user)
             .environmentObject(airportsService)
+            .environmentObject(locationService)
         }
     }
 }

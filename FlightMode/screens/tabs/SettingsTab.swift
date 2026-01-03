@@ -141,7 +141,12 @@ struct SettingsTab : View {
                 }
                 .padding(.horizontal, 20)
                 .frame(width: geometry.size.width, alignment: .topLeading)
+                Text("App version \(Bundle.main.appVersion) (\(Bundle.main.buildNumber))")
+                    .font(.custom("Montserrat", size: 14))
+                    .fontWeight(.regular)
+                    .padding(.vertical, 10)
             }
+            .scrollIndicators(.hidden)
         }
     }
 }

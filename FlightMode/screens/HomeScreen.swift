@@ -54,6 +54,7 @@ struct HomeScreen : View {
         .flightAcademy: AnyView(FlightAcademyTab()),
         .history: AnyView(HistoryTab()),
         .settings: AnyView(SettingsTab()),
+        .flight(.selectAirport): AnyView(SelectAirportTab())
     ]
     
     @State var currentTab: TabWidgetType = TabWidgetType.home
@@ -64,12 +65,15 @@ struct HomeScreen : View {
     @State var tabHeight: Double = 180
     
     @EnvironmentObject var airportsService: AirportsService
+    @EnvironmentObject var locationService: LocationService
     
     @State var position: MapCameraPosition = MapCameraPosition.region(
         MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)
         )
     )
+    
+    @State var overlayContent: AnyView?
     
     func openWidget(tabWidgetType: TabWidgetType) {
         currentTab = tabWidgetType
@@ -91,19 +95,81 @@ struct HomeScreen : View {
                 CustomTab()
             )
         case .flight(let flightWidgetType):
-            currentTabShape = AnyShape(
-                CustomTab()
-            )
+            switch flightWidgetType {
+            case .setLocation:
+                currentTabShape = AnyShape(
+                    CustomTab()
+                )
+            case .selectAirport:
+                currentTabShape = AnyShape(
+                    UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
+                )
+                overlayContent = AnyView(SelectAirportOverlay())
+            case .selectSeat:
+                currentTabShape = AnyShape(
+                    CustomTab()
+                )
+            case .ticket:
+                currentTabShape = AnyShape(
+                    CustomTab()
+                )
+            case .fly:
+                currentTabShape = AnyShape(
+                    CustomTab()
+                )
+            }
         }
         
-        if currentTab == .home {
+        switch currentTab {
+        case .home:
             withAnimation(.linear) {
                 tabHeight = 180
             }
-        } else {
-            withAnimation(.easeIn(duration: 0.2)) {
+        case .flightAcademy:
+            withAnimation(.linear) {
                 tabHeight = 500
             }
+        case .history:
+            withAnimation(.linear) {
+                tabHeight = 500
+            }
+        case .settings:
+            withAnimation(.linear) {
+                tabHeight = 500
+            }
+        case .flight(let flightWidgetType):
+            switch flightWidgetType {
+            case .setLocation:
+                withAnimation(.linear) {
+                    tabHeight = 500
+                }
+            case .selectAirport:
+                withAnimation(.linear) {
+                    tabHeight = 100
+                }
+            case .selectSeat:
+                withAnimation(.linear) {
+                    tabHeight = .infinity
+                }
+            case .ticket:
+                withAnimation(.linear) {
+                    tabHeight = .infinity
+                }
+            case .fly:
+                withAnimation(.linear) {
+                    tabHeight = .infinity
+                }
+            }
+        }
+    }
+    
+    func animateMapTo(lat: Double, lon: Double) {
+        withAnimation(.easeInOut(duration: 2.0)) {
+            position = MapCameraPosition.region(
+                MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: lat, longitude: lon), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)
+                )
+            )
         }
     }
     
@@ -113,7 +179,7 @@ struct HomeScreen : View {
                 Map(position: $position) {
                     if let firstAirport = airportsService.airports.first {
                         Annotation("test", coordinate: CLLocationCoordinate2D(latitude: firstAirport.lat, longitude: firstAirport.lon)) {
-                            Text((firstAirport.iata != nil ? firstAirport.iata : firstAirport.icao) ?? firstAirport.icao)
+                            Text(firstAirport.iata ?? firstAirport.icao)
                                 .font(.custom("Montserrat", size: 18))
                                 .fontWeight(.bold)
                                 .foregroundStyle(.white)
@@ -128,6 +194,64 @@ struct HomeScreen : View {
                         }
                         .annotationTitles(.hidden)
                     } // endure in some struct
+                    if let pos = locationService.location {
+                        Annotation("POSITION", coordinate: CLLocationCoordinate2D(latitude: pos.latitude, longitude: pos.longitude)) {
+                            Color.white.opacity(0.15)
+                                .frame(width: 30, height: 30)
+                                .clipShape(.circle)
+                                .overlay {
+                                    Color.white
+                                        .frame(width: 20, height: 20)
+                                        .clipShape(.circle)
+                                        .overlay {
+                                            Color(hex: "FFAE17")
+                                                .frame(width: 10, height: 10)
+                                                .clipShape(.circle)
+                                        }
+                                }
+                        }
+                        .annotationTitles(.hidden)
+                    }
+                    if let selectedAirport = airportsService.selectedAirport {
+                        Annotation("test", coordinate: CLLocationCoordinate2D(latitude: selectedAirport.lat, longitude: selectedAirport.lon)) {
+                            Text(selectedAirport.iata ?? selectedAirport.icao)
+                                .font(.custom("Montserrat", size: 18))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color(hex: "FFAE17"))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 1))
+                                        .foregroundStyle(.white)
+                                }
+                        }
+                        .annotationTitles(.hidden)
+                        if let time = airportsService.selectedTime {
+                            MapCircle(center: CLLocationCoordinate2D(latitude: selectedAirport.lat, longitude: selectedAirport.lon), radius: time * airportsService.airplaneAverageSpeed)
+                                .foregroundStyle(.white.opacity(0.15))
+                                .stroke(.white.opacity(0.25), lineWidth: 1)
+                                .mapOverlayLevel(level: .aboveLabels)
+                        }
+                    }
+                    ForEach(airportsService.showableAirports, id: \.self) { point in
+                        Annotation(point.airport.name ?? "airport", coordinate: CLLocationCoordinate2D(latitude: point.airport.lat, longitude: point.airport.lon)) {
+                            Text((point.airport.iata != nil ? point.airport.iata : point.airport.icao) ?? point.airport.icao)
+                                .font(.custom("Montserrat", size: 18))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color(hex: "4D4D4D"))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 1))
+                                        .foregroundStyle(.white)
+                                }
+                        }
+                        .annotationTitles(.hidden)
+                    }
                 }
                 .preferredColorScheme(.dark)
                 .mapStyle(.standard(elevation: .realistic, emphasis: .automatic))
@@ -266,13 +390,18 @@ struct HomeScreen : View {
                 }
                 .padding(.horizontal, 20)
                 VStack {
+                    if let _overlayContent = overlayContent {
+                        _overlayContent
+                        .frame(width: geometry.size.width, height: 80) // TODO: flexible size
+                    }
                     ZStack(alignment: .top) {
                         tabWidgets[currentTab]
                             .padding(.vertical, 30)
-                            .frame(width: geometry.size.width, height: tabHeight)
+                            .frame(width: geometry.size.width)
+                            .frame(maxHeight: tabHeight)
                             .background(Color(hex: "2F2F2F").opacity(0.75))
                             .clipShape(currentTabShape)
-                        if currentTab != TabWidgetType.home {
+                        if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport)].contains(currentTab) {
                             if #available(iOS 26, *) {
                                 Button(action: {
                                     openWidget(tabWidgetType: .home)
@@ -296,16 +425,12 @@ struct HomeScreen : View {
                         openWidget(tabWidgetType: tabType)
                     })
                 )
-            }
-        }
-        .onAppear {
-            
-            if let firstAirport = airportsService.airports.first {
-                position = MapCameraPosition.region(
-                    MKCoordinateRegion(
-                        center: CLLocationCoordinate2D(latitude: firstAirport.lat, longitude: firstAirport.lon), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)
-                    )
-                )
+                locationService.requestLocation()
+                locationService.locationCallback = {
+                    if let pos = locationService.location {
+                        animateMapTo(lat: pos.latitude, lon: pos.longitude)
+                    }
+                }
             }
         }
         .ignoresSafeArea(edges: .bottom)

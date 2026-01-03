@@ -20,10 +20,41 @@ struct Airport: Codable {
     let tz: String?
 }
 
+class AirportPoint: Hashable {
+    let airport: Airport
+    var nearest: Bool
+    let time: Double
+    
+    init(airport: Airport, nearest: Bool, time: Double) {
+        self.airport = airport
+        self.nearest = nearest
+        self.time = time
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(airport.name)
+    }
+    
+    static func == (lhs: AirportPoint, rhs: AirportPoint) -> Bool {
+        return
+        lhs.airport.lat == rhs.airport.lat &&
+        lhs.airport.lon == rhs.airport.lon &&
+        lhs.airport.name == rhs.airport.name
+    }
+}
+
 class AirportsService: ObservableObject {
     
     @Published private(set) var airports: [Airport] = []
-    @Published private(set) var cityAirpots: [String: Airport] = [:]
+    @Published private(set) var cityAirports: [String: [Airport]] = [:]
+    
+    @Published private(set) var showableAirports: [AirportPoint] = []
+    
+    @Published var selectedAirport: Airport?
+    @Published private(set) var selectedTime: Double?
+    
+    let timeDelta: Double = 300.0 // in seconds
+    let airplaneAverageSpeed: Double = 230 // m/s
     
     init() {
         load()
@@ -39,6 +70,10 @@ class AirportsService: ObservableObject {
             let decoder = JSONDecoder()
             let dict = try decoder.decode([String: Airport].self, from: data)
             airports = Array(dict.values)
+            airports.removeAll(where: { airport in
+                airport.iata == nil || airport.name == nil || airport.iata == "" || airport.icao == ""
+            })
+            getCityAirports()
         } catch {
             
         }
@@ -61,7 +96,7 @@ class AirportsService: ObservableObject {
         
         let c: Double = sin(dLat / 2) * sin(dLat / 2) + cos(a.lat * .pi / 180) * cos(b.lat * .pi / 180) * sin(dLon / 2) * sin(dLon / 2)
         
-        return 2 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
+        return 2 * 1000 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
     }
     
     func distance(lat: Double, lon: Double, b: Airport) -> Double {
@@ -72,6 +107,61 @@ class AirportsService: ObservableObject {
         
         let c: Double = sin(dLat / 2) * sin(dLat / 2) + cos(lat * .pi / 180) * cos(b.lat * .pi / 180) * sin(dLon / 2) * sin(dLon / 2)
         
-        return 2 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
+        return 2 * 1000 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
+    }
+    
+    func findNearestAirport(lat: Double, lon: Double) -> Airport? {
+        
+        var a: Airport?
+        var dist: Double = .infinity
+        
+        for airport in airports {
+            let d: Double = distance(lat: lat, lon: lon, b: airport)
+            if (d < dist) {
+                dist = d
+                a = airport
+            }
+        }
+        
+        return a
+    }
+    
+    func getCityAirports() {
+        var cityAirports: [String: [Airport]] = [:]
+        for airport in airports {
+            if let cityName = airport.city {
+                cityAirports[cityName]?.append(airport)
+            }
+        }
+        self.cityAirports = cityAirports
+    }
+    
+    func getShowableAirports(lat: Double, lon: Double, time: Double) {
+        if let a = findNearestAirport(lat: lat, lon: lon) {
+            selectedAirport = a
+            selectedTime = time
+            var airportPoints: [AirportPoint] = []
+            for airport in airports {
+                let d: Double = distance(a: a, b: airport)
+                print(d)
+                let time: Double = d / airplaneAverageSpeed // time to fly in seconds
+                let point: AirportPoint = AirportPoint(airport: airport, nearest: false, time: time)
+                airportPoints.append(point)
+            }
+            airportPoints.sort(by: { a, b in
+                return abs(a.time - time) < abs(b.time - time)
+            })
+            airportPoints.removeAll(where: { point in
+                abs(point.time - time) > timeDelta
+            })
+            if let bestAirport = airportPoints.first {
+                bestAirport.nearest = true
+            }
+            self.showableAirports = Array(airportPoints)
+        }
+    }
+    
+    func getShowableAirports(airport: Airport, time: Double) {
+        selectedAirport = airport
     }
 }
