@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10BF0E432F09484000FF384D /* airports.json in Resources */ = {isa = PBXBuildFile; fileRef = 10BF0E422F09484000FF384D /* airports.json */; };
 		10E3EFB12EFDBEA800068B09 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 10E3EFB02EFDBEA800068B09 /* RevenueCat */; };
 		10E3EFB32EFDBEA800068B09 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 10E3EFB22EFDBEA800068B09 /* RevenueCatUI */; };
 		10E3EFC22EFDBEBF00068B09 /* Montserrat.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 10E3EFC02EFDBEBF00068B09 /* Montserrat.ttf */; };
@@ -14,6 +15,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		10BF0E3A2F09359A00FF384D /* TicketWarp.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = TicketWarp.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
+		10BF0E422F09484000FF384D /* airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = airports.json; sourceTree = "<group>"; };
 		10E3EF8B2EFDBE4400068B09 /* FlightMode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightMode.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10E3EFC02EFDBEBF00068B09 /* Montserrat.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Montserrat.ttf; sourceTree = "<group>"; };
 		10E3EFC12EFDBEBF00068B09 /* Wattauchimma.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Wattauchimma.ttf; sourceTree = "<group>"; };
@@ -60,6 +63,7 @@
 				10E3EFC12EFDBEBF00068B09 /* Wattauchimma.ttf */,
 				10E3EF8C2EFDBE4400068B09 /* Products */,
 				10E3EF8D2EFDBE4400068B09 /* FlightMode */,
+				10BF0E422F09484000FF384D /* airports.json */,
 			);
 			sourceTree = "<group>";
 		};
@@ -67,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				10E3EF8B2EFDBE4400068B09 /* FlightMode.app */,
+				10BF0E3A2F09359A00FF384D /* TicketWarp.metallib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,6 +79,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		10BF0E392F09359A00FF384D /* TicketWarp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10BF0E3E2F09359A00FF384D /* Build configuration list for PBXNativeTarget "TicketWarp" */;
+			buildPhases = (
+				10BF0E382F09359A00FF384D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TicketWarp;
+			packageProductDependencies = (
+			);
+			productName = TicketWarp;
+			productReference = 10BF0E3A2F09359A00FF384D /* TicketWarp.metallib */;
+			productType = "com.apple.product-type.metal-library";
+		};
 		10E3EF8A2EFDBE4400068B09 /* FlightMode */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 10E3EF962EFDBE4600068B09 /* Build configuration list for PBXNativeTarget "FlightMode" */;
@@ -108,6 +130,9 @@
 				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
+					10BF0E392F09359A00FF384D = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					10E3EF8A2EFDBE4400068B09 = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -131,6 +156,7 @@
 			projectRoot = "";
 			targets = (
 				10E3EF8A2EFDBE4400068B09 /* FlightMode */,
+				10BF0E392F09359A00FF384D /* TicketWarp */,
 			);
 		};
 /* End PBXProject section */
@@ -140,6 +166,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10BF0E432F09484000FF384D /* airports.json in Resources */,
 				10E3EFC22EFDBEBF00068B09 /* Montserrat.ttf in Resources */,
 				10E3EFC32EFDBEBF00068B09 /* Wattauchimma.ttf in Resources */,
 			);
@@ -148,6 +175,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		10BF0E382F09359A00FF384D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		10E3EF872EFDBE4400068B09 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -158,6 +192,28 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		10BF0E3F2F09359A00FF384D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = FlightMode/shaders/TicketWarp.metal;
+				DEVELOPMENT_TEAM = 42LM52NS36;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Debug;
+		};
+		10BF0E402F09359A00FF384D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = FlightMode/shaders/TicketWarp.metal;
+				DEVELOPMENT_TEAM = 42LM52NS36;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VERSIONING_SYSTEM = "";
+			};
+			name = Release;
+		};
 		10E3EF942EFDBE4600068B09 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -354,6 +410,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		10BF0E3E2F09359A00FF384D /* Build configuration list for PBXNativeTarget "TicketWarp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10BF0E3F2F09359A00FF384D /* Debug */,
+				10BF0E402F09359A00FF384D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		10E3EF862EFDBE4400068B09 /* Build configuration list for PBXProject "FlightMode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

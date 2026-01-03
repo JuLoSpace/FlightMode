@@ -75,16 +75,13 @@ struct SettingsTab : View {
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                     ForEach(Array(buttons.keys.sorted(by: {a, b in
-                        if (a == "Profile") {
-                            return true
-                        }
-                        if (a == "Notifications") {
-                            return true
-                        }
-                        if (a == "Subscription") {
-                            return true
-                        }
-                        return false
+                        let k: [String: Int] = [
+                            "Profile": 0,
+                            "Notifications": 1,
+                            "Subscription": 2,
+                            "About": 3
+                        ]
+                        return k[a]! < k[b]!
                     })), id: \.self) { sect in
                         Text(sect)
                             .font(.custom("Montserrat", size: 24))
