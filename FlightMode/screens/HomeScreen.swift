@@ -163,11 +163,11 @@ struct HomeScreen : View {
         }
     }
     
-    func animateMapTo(lat: Double, lon: Double) {
+    func animateMapTo(lat: Double, lon: Double, delta: Double) {
         withAnimation(.easeInOut(duration: 2.0)) {
             position = MapCameraPosition.region(
                 MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(latitude: lat, longitude: lon), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)
+                    center: CLLocationCoordinate2D(latitude: lat, longitude: lon), span: MKCoordinateSpan(latitudeDelta: delta, longitudeDelta: delta)
                 )
             )
         }
@@ -212,9 +212,9 @@ struct HomeScreen : View {
                         }
                         .annotationTitles(.hidden)
                     }
-                    if let selectedAirport = airportsService.selectedAirport {
-                        Annotation("test", coordinate: CLLocationCoordinate2D(latitude: selectedAirport.lat, longitude: selectedAirport.lon)) {
-                            Text(selectedAirport.iata ?? selectedAirport.icao)
+                    if let departureAirport = airportsService.departureAirport {
+                        Annotation("test", coordinate: CLLocationCoordinate2D(latitude: departureAirport.lat, longitude: departureAirport.lon)) {
+                            Text(departureAirport.iata ?? departureAirport.icao)
                                 .font(.custom("Montserrat", size: 18))
                                 .fontWeight(.bold)
                                 .foregroundStyle(.white)
@@ -229,7 +229,7 @@ struct HomeScreen : View {
                         }
                         .annotationTitles(.hidden)
                         if let time = airportsService.selectedTime {
-                            MapCircle(center: CLLocationCoordinate2D(latitude: selectedAirport.lat, longitude: selectedAirport.lon), radius: time * airportsService.airplaneAverageSpeed)
+                            MapCircle(center: CLLocationCoordinate2D(latitude: departureAirport.lat, longitude: departureAirport.lon), radius: time * airportsService.airplaneAverageSpeed)
                                 .foregroundStyle(.white.opacity(0.15))
                                 .stroke(.white.opacity(0.25), lineWidth: 1)
                                 .mapOverlayLevel(level: .aboveLabels)
@@ -243,12 +243,15 @@ struct HomeScreen : View {
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(Color(hex: "4D4D4D"))
+                                .background(Color(hex: point.airport == airportsService.destinationAirport ? "#FFAE17" : "4D4D4D"))
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 1))
                                         .foregroundStyle(.white)
                                 }
+                                .onTapGesture(perform: {
+                                    airportsService.selectDestinationAirport(point.airport)
+                                })
                         }
                         .annotationTitles(.hidden)
                     }
@@ -392,7 +395,7 @@ struct HomeScreen : View {
                 VStack {
                     if let _overlayContent = overlayContent {
                         _overlayContent
-                        .frame(width: geometry.size.width, height: 80) // TODO: flexible size
+                        .frame(width: geometry.size.width, height: 180) // TODO: flexible size
                     }
                     ZStack(alignment: .top) {
                         tabWidgets[currentTab]
@@ -411,6 +414,7 @@ struct HomeScreen : View {
                                         .frame(width: 34, height: 34)
                                 })
                                 .buttonBorderShape(.circle)
+                                .contentShape(.circle)
                                 .buttonStyle(.glass)
                                 .offset(y: -34)
                             }
@@ -428,8 +432,11 @@ struct HomeScreen : View {
                 locationService.requestLocation()
                 locationService.locationCallback = {
                     if let pos = locationService.location {
-                        animateMapTo(lat: pos.latitude, lon: pos.longitude)
+                        animateMapTo(lat: pos.latitude, lon: pos.longitude, delta: 2.0)
                     }
+                }
+                airportsService.mapMoveCallback = { lat, lon, delta in
+                    animateMapTo(lat: lat, lon: lon, delta: delta)
                 }
             }
         }

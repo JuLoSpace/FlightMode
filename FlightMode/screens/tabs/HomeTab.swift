@@ -48,6 +48,7 @@ struct HomeTab : View {
                             Image("academy_tab")
                         })
                         .frame(width: 70, height: 70)
+                        .contentShape(.circle)
                         .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                     }
                     if #available(iOS 26, *) {
@@ -57,6 +58,7 @@ struct HomeTab : View {
                             Image("history_tab")
                         })
                         .frame(width: 70, height: 70)
+                        .contentShape(.circle)
                         .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                     }
                     if #available(iOS 26, *) {
@@ -66,6 +68,7 @@ struct HomeTab : View {
                             Image("settings_tab")
                         })
                         .frame(width: 70, height: 70)
+                        .contentShape(.circle)
                         .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                     }
                 }
