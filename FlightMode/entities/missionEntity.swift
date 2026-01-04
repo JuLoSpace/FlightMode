@@ -6,7 +6,7 @@
 //
 
 
-enum Mission: CaseIterable {
+enum Mission: Int, Codable, CaseIterable {
     case code
     case read
     case write

@@ -149,7 +149,6 @@ struct TicketView: View {
                     .frame(width: width, height: 20, alignment: .bottom)
                     .contentShape(.rect)
                     .gesture(DragGesture().onChanged { value in
-                        print(value.location.x)
         //                cutXPosition = max(cutXPosition, value.location.x)
                         cutXPosition = value.location.x
                     })

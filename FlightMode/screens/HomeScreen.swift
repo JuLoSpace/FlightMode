@@ -54,7 +54,6 @@ struct HomeScreen : View {
         .flightAcademy: AnyView(FlightAcademyTab()),
         .history: AnyView(HistoryTab()),
         .settings: AnyView(SettingsTab()),
-        .flight(.selectAirport): AnyView(SelectAirportTab())
     ]
     
     @State var currentTab: TabWidgetType = TabWidgetType.home
@@ -74,6 +73,7 @@ struct HomeScreen : View {
     )
     
     @State var overlayContent: AnyView?
+    @State var overlayScreen: AnyView?
     
     func openWidget(tabWidgetType: TabWidgetType) {
         currentTab = tabWidgetType
@@ -82,33 +82,44 @@ struct HomeScreen : View {
             currentTabShape = AnyShape(
                 UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
             )
+            overlayScreen = nil
         case .flightAcademy:
             currentTabShape = AnyShape(
                 CustomTab()
             )
+            overlayScreen = nil
         case .history:
             currentTabShape = AnyShape(
                 CustomTab()
             )
+            overlayScreen = nil
         case .settings:
             currentTabShape = AnyShape(
                 CustomTab()
             )
+            overlayScreen = nil
         case .flight(let flightWidgetType):
             switch flightWidgetType {
             case .setLocation:
                 currentTabShape = AnyShape(
                     CustomTab()
                 )
+                overlayScreen = nil
             case .selectAirport:
                 currentTabShape = AnyShape(
                     UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
                 )
                 overlayContent = AnyView(SelectAirportOverlay())
+                overlayScreen = nil
             case .selectSeat:
                 currentTabShape = AnyShape(
                     CustomTab()
                 )
+                overlayScreen = AnyView(SeatSelectorScreen(
+                    onTabCallback: { type in
+                        openWidget(tabWidgetType: type)
+                    }
+                ))
             case .ticket:
                 currentTabShape = AnyShape(
                     CustomTab()
@@ -177,23 +188,6 @@ struct HomeScreen : View {
         GeometryReader { geometry in
             ZStack(alignment: .topLeading) {
                 Map(position: $position) {
-                    if let firstAirport = airportsService.airports.first {
-                        Annotation("test", coordinate: CLLocationCoordinate2D(latitude: firstAirport.lat, longitude: firstAirport.lon)) {
-                            Text(firstAirport.iata ?? firstAirport.icao)
-                                .font(.custom("Montserrat", size: 18))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color(hex: "4D4D4D"))
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 1))
-                                        .foregroundStyle(.white)
-                                }
-                        }
-                        .annotationTitles(.hidden)
-                    } // endure in some struct
                     if let pos = locationService.location {
                         Annotation("POSITION", coordinate: CLLocationCoordinate2D(latitude: pos.latitude, longitude: pos.longitude)) {
                             Color.white.opacity(0.15)
@@ -234,6 +228,13 @@ struct HomeScreen : View {
                                 .stroke(.white.opacity(0.25), lineWidth: 1)
                                 .mapOverlayLevel(level: .aboveLabels)
                         }
+                        if let destinationAirport = airportsService.destinationAirport {
+                            MapPolyline(coordinates: [
+                                CLLocationCoordinate2D(latitude: departureAirport.lat, longitude: departureAirport.lon),
+                                CLLocationCoordinate2D(latitude: destinationAirport.lat, longitude: destinationAirport.lon)
+                            ])
+                            .stroke(.white, lineWidth: 2,)
+                        }
                     }
                     ForEach(airportsService.showableAirports, id: \.self) { point in
                         Annotation(point.airport.name ?? "airport", coordinate: CLLocationCoordinate2D(latitude: point.airport.lat, longitude: point.airport.lon)) {
@@ -243,11 +244,11 @@ struct HomeScreen : View {
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 6)
-                                .background(Color(hex: point.airport == airportsService.destinationAirport ? "#FFAE17" : "4D4D4D"))
+                                .background(Color(hex: point.airport == airportsService.destinationAirport ? "544323" : "4D4D4D"))
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 1))
-                                        .foregroundStyle(.white)
+                                    RoundedRectangle(cornerRadius: 16).stroke(style: StrokeStyle(lineWidth: 2))
+                                        .foregroundStyle(Color(hex: point.airport == airportsService.destinationAirport ? "FFAE17" : "FFFFFF"))
                                 }
                                 .onTapGesture(perform: {
                                     airportsService.selectDestinationAirport(point.airport)
@@ -422,6 +423,10 @@ struct HomeScreen : View {
                     }
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
+                if let overlay = overlayScreen {
+                    overlay
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                }
             }
             .onAppear {
                 tabWidgets[.home] = AnyView(
@@ -429,6 +434,9 @@ struct HomeScreen : View {
                         openWidget(tabWidgetType: tabType)
                     })
                 )
+                tabWidgets[.flight(.selectAirport)] = AnyView(SelectAirportTab(onTabCallback: { type in
+                    openWidget(tabWidgetType: type)
+                }))
                 locationService.requestLocation()
                 locationService.locationCallback = {
                     if let pos = locationService.location {

@@ -9,12 +9,14 @@ import SwiftUI
 
 struct SelectAirportTab: View {
     
+    var onTabCallback: (TabWidgetType) -> ()
+    
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .center) {
                 if #available(iOS 26, *) {
                     Button(action: {
-    //                    onTabCallback()
+                        onTabCallback(TabWidgetType.flight(.selectSeat))
                     }, label: {
                         Text("Book my flight")
                             .font(.custom("Montserrat", size: 20))

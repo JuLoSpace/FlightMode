@@ -35,10 +35,43 @@ class UserModel : ObservableObject {
     
     @Published private(set) var isPremium: Bool = false
     
-    @AppStorage("promotional") var discount: Date?
+    @Published var discount: Date?
+    @Published var favoriteMissions: [Mission] = []
+    @Published var notificationTime: TimeInterval = 0
     
     init() {
         initializatePurchases()
+        readStorage()
+    }
+    
+    func readStorage() {
+        favoriteMissions = Storage.readFavoriteMissions()
+        notificationTime = Storage.readNotificationTime()
+        discount = Storage.readDiscountDate()
+    }
+    
+    func setFavoriteMission(missions: [Mission]) {
+        favoriteMissions = missions
+        Storage.saveFavoriteMissions(missions: favoriteMissions)
+    }
+    
+    func addFavoriteMission(mission: Mission) {
+        favoriteMissions.append(mission)
+        Storage.saveFavoriteMissions(missions: favoriteMissions)
+    }
+    
+    func removeFavoriteMission(mission: Mission) {
+        favoriteMissions.removeAll(where: { $0 == mission })
+        Storage.saveFavoriteMissions(missions: favoriteMissions)
+    }
+    
+    func setNotificationTime(time: TimeInterval) {
+        Storage.saveNotificationTime(time: time)
+    }
+    
+    func setDiscountDate(date: Date) {
+        discount = date
+        Storage.saveDiscountDate(date: date)
     }
     
     func initializatePurchases() {
@@ -49,7 +82,9 @@ class UserModel : ObservableObject {
     func getCustomerInfo() {
         Purchases.shared.getCustomerInfo { (customerInfo, error) in
             if let info = customerInfo {
-                self.updateCustomerInfo(customerInfo: info)
+                DispatchQueue.main.async {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
             }
         }
     }
@@ -65,37 +100,39 @@ class UserModel : ObservableObject {
     func getOfferings() {
         Purchases.shared.getOfferings { (offerings, error) in
             if let packages = offerings?.offering(identifier: "premium")?.availablePackages {
-                packages.forEach { pack in
-                    if pack.identifier == "$rc_lifetime" {
-                        self.subscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.availableSubscriptions[SubscriptionType.yearly] = true
-                        self.subscriptionPackages[SubscriptionType.yearly] = pack
-                    }
-                    if pack.identifier == "$rc_monthly" {
-                        self.subscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.availableSubscriptions[SubscriptionType.monthly] = true
-                        self.subscriptionPackages[SubscriptionType.monthly] = pack
-                    }
-                    if pack.identifier == "$rc_weekly" {
-                        self.subscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.availableSubscriptions[SubscriptionType.weekly] = true
-                        self.subscriptionPackages[SubscriptionType.weekly] = pack
-                    }
-                    
-                    if pack.identifier == "yearly_sub_discount" {
-                        self.discountSubscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.discountAvailableSubscriptions[SubscriptionType.yearly] = true
-                        self.discountSubscriptionPackages[SubscriptionType.yearly] = pack
-                    }
-                    if pack.identifier == "monthly_sub_discount" {
-                        self.discountSubscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.discountAvailableSubscriptions[SubscriptionType.monthly] = true
-                        self.discountSubscriptionPackages[SubscriptionType.monthly] = pack
-                    }
-                    if pack.identifier == "weekly_sub_discount" {
-                        self.discountSubscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
-                        self.discountAvailableSubscriptions[SubscriptionType.weekly] = true
-                        self.discountSubscriptionPackages[SubscriptionType.weekly] = pack
+                DispatchQueue.main.async {
+                    packages.forEach { pack in
+                        if pack.identifier == "$rc_lifetime" {
+                            self.subscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.availableSubscriptions[SubscriptionType.yearly] = true
+                            self.subscriptionPackages[SubscriptionType.yearly] = pack
+                        }
+                        if pack.identifier == "$rc_monthly" {
+                            self.subscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.availableSubscriptions[SubscriptionType.monthly] = true
+                            self.subscriptionPackages[SubscriptionType.monthly] = pack
+                        }
+                        if pack.identifier == "$rc_weekly" {
+                            self.subscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.availableSubscriptions[SubscriptionType.weekly] = true
+                            self.subscriptionPackages[SubscriptionType.weekly] = pack
+                        }
+                        
+                        if pack.identifier == "yearly_sub_discount" {
+                            self.discountSubscriptions[SubscriptionType.yearly] = Subscription(type: SubscriptionType.yearly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.discountAvailableSubscriptions[SubscriptionType.yearly] = true
+                            self.discountSubscriptionPackages[SubscriptionType.yearly] = pack
+                        }
+                        if pack.identifier == "monthly_sub_discount" {
+                            self.discountSubscriptions[SubscriptionType.monthly] = Subscription(type: SubscriptionType.monthly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.discountAvailableSubscriptions[SubscriptionType.monthly] = true
+                            self.discountSubscriptionPackages[SubscriptionType.monthly] = pack
+                        }
+                        if pack.identifier == "weekly_sub_discount" {
+                            self.discountSubscriptions[SubscriptionType.weekly] = Subscription(type: SubscriptionType.weekly, price: pack.storeProduct.localizedPriceString, amount: Double(truncating: NSDecimalNumber(decimal: pack.storeProduct.price)))
+                            self.discountAvailableSubscriptions[SubscriptionType.weekly] = true
+                            self.discountSubscriptionPackages[SubscriptionType.weekly] = pack
+                        }
                     }
                 }
             }
@@ -104,15 +141,21 @@ class UserModel : ObservableObject {
     
     func makePurchase(subscriptionType: SubscriptionType, isDiscount: Bool = false) {
         if (!isDiscount) {
-            Purchases.shared.purchase(package: subscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+            guard let package = subscriptionPackages[subscriptionType] else { return }
+            Purchases.shared.purchase(package: package) { (transaction, customerInfo, error, userCancelled) in
                 if let info = customerInfo {
-                    self.updateCustomerInfo(customerInfo: info)
+                    DispatchQueue.main.async {
+                        self.updateCustomerInfo(customerInfo: info)
+                    }
                 }
             }
         } else {
-            Purchases.shared.purchase(package: discountSubscriptionPackages[subscriptionType]!) { (transaction, customerInfo, error, userCancelled) in
+            guard let package = discountSubscriptionPackages[subscriptionType] else { return }
+            Purchases.shared.purchase(package: package) { (transaction, customerInfo, error, userCancelled) in
                 if let info = customerInfo {
-                    self.updateCustomerInfo(customerInfo: info)
+                    DispatchQueue.main.async {
+                        self.updateCustomerInfo(customerInfo: info)
+                    }
                 }
             }
         }
@@ -121,7 +164,9 @@ class UserModel : ObservableObject {
     func restorePurchases() {
         Purchases.shared.restorePurchases { customerInfo, error in
             if let info = customerInfo {
-                self.updateCustomerInfo(customerInfo: info)
+                DispatchQueue.main.async {
+                    self.updateCustomerInfo(customerInfo: info)
+                }
             }
         }
     }
@@ -136,11 +181,12 @@ class UserModel : ObservableObject {
     
     func seeDiscount() {
         if (discount == nil) {
-            discount = Date.now
+            setDiscountDate(date: Date.now)
         }
     }
     
     func promotionalExist() -> Int {
-        return 3600 * 24 - Int(Date.now.timeIntervalSince(discount!))
+        guard let discount = discount else { return 0 }
+        return 3600 * 24 - Int(Date.now.timeIntervalSince(discount))
     }
 }

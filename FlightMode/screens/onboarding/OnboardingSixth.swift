@@ -281,12 +281,15 @@ struct OnboardingScreenSixth : View {
     
     @State private var confirmButtonView: AnyView?
     
+    @EnvironmentObject var user: UserModel
+    
     private func updateConfirmButton(height: Double, width: Double) {
         
         if #available(iOS 26, *) {
             confirmButtonView = AnyView(
                 Button(action: {
                     if selectedMissions.count == 5 {
+                        user.setFavoriteMission(missions: selectedMissions)
                         router.navigate(to: Route.onboarding(Route.OnboardingScreen.seventh))
                     }
                 }, label: {
