@@ -124,6 +124,8 @@ struct HomeScreen : View {
                 currentTabShape = AnyShape(
                     CustomTab()
                 )
+                overlayContent = nil
+                overlayScreen = AnyView(TicketScreen())
             case .fly:
                 currentTabShape = AnyShape(
                     CustomTab()
@@ -422,7 +424,8 @@ struct HomeScreen : View {
                         }
                     }
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .bottom)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .ignoresSafeArea(edges: .bottom)
                 if let overlay = overlayScreen {
                     overlay
                         .frame(width: geometry.size.width, height: geometry.size.height)
@@ -448,7 +451,7 @@ struct HomeScreen : View {
                 }
             }
         }
-        .ignoresSafeArea(edges: .bottom)
+//        .ignoresSafeArea(edges: .bottom)
     }
 }
 
