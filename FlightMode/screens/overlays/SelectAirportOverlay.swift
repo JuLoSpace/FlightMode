@@ -25,35 +25,39 @@ struct SelectAirportOverlay: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
+        VStack {
             if #available(iOS 26, *) {
                 VStack {
-                    ScrollView(.horizontal) {
-                        LazyHStack {
-                            ForEach(1..<31, id: \.self) { m in
-                                let hours = (m * 10) / 60
-                                let minutes = (m * 10) % 60
-                                let time: String = hours == 0 ? "\(minutes)m" : (minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m")
-                                Text(time)
-                                    .font(.custom("Montserrat", size: m == activeId ? 24 : 16))
-                                    .frame(width: 100)
-                                    .foregroundStyle(m == activeId ? .white : .white.opacity(0.25))
-                                    .id(m)
+                    GeometryReader { geometry in
+                        ScrollView(.horizontal) {
+                            LazyHStack {
+                                ForEach(1..<31, id: \.self) { m in
+                                    let hours = (m * 10) / 60
+                                    let minutes = (m * 10) % 60
+                                    let time: String = hours == 0 ? "\(minutes)m" : (minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m")
+                                    Text(time)
+                                        .font(.custom("Montserrat", size: m == activeId ? 28 : 14))
+                                        .fontWeight(m == activeId ? .bold : .regular)
+                                        .frame(width: 100)
+                                        .foregroundStyle(m == activeId ? .white : .white.opacity(0.25))
+                                        .id(m)
+                                }
                             }
+                            .scrollTargetLayout()
                         }
-                        .scrollTargetLayout()
+                        .contentMargins(.horizontal, geometry.size.width / 2 - 70)
+                        .scrollTargetBehavior(.viewAligned)
+                        .scrollPosition(id: $activeId, anchor: .center)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: activeId)
+                        .onChange(of: activeId) { oldValue, newValue in
+                            updateAirports()
+                        }
+                        .glassEffect()
+                        .padding(.horizontal, 20)
+                        .scrollIndicators(.hidden)
                     }
-                    .contentMargins(.horizontal, geometry.size.width / 2 - 70)
-                    .scrollTargetBehavior(.viewAligned)
-                    .scrollPosition(id: $activeId, anchor: .center)
-                    .sensoryFeedback(.impact(weight: .medium), trigger: activeId)
-                    .onChange(of: activeId) { oldValue, newValue in
-                        updateAirports()
-                    }
-                    .frame(width: geometry.size.width - 40, height: 80)
-                    .glassEffect()
-                    .padding(.horizontal, 20)
-                    .scrollIndicators(.hidden)
+                    .frame(height: 80)
+                    .padding(.bottom, 20)
                     ScrollView(.horizontal) {
                         HStack(spacing: 0) {
                             ForEach(airportsService.showableAirports, id: \.self) { point in
@@ -64,22 +68,23 @@ struct SelectAirportOverlay: View {
                                     let time: String = hours == 0 ? "\(minutes)m" : (minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m")
                                     VStack(spacing: 0) {
                                         Text(cityName)
-                                            .font(.custom("Monserrat", size: 12))
+                                            .font(.custom("Montserrat", size: 12))
                                             .fontWeight(.regular)
                                             .foregroundStyle(.white)
+                                            .padding(.horizontal, 5)
                                         Spacer()
                                         Text(time)
-                                            .font(.custom("Monserrat", size: 16))
+                                            .font(.custom("Montserrat", size: 16))
                                             .fontWeight(.bold)
                                             .foregroundStyle(.white)
-                                            .frame(width: 70, height: 50)
+                                            .frame(width: 60, height: 60)
                                             .background(Color(hex: "3F3F3F"))
                                             .clipShape(.circle)
                                     }
                                     .padding(.top, 20)
                                     .padding(.bottom, 5)
-                                    .padding(.horizontal, 5)
-                                    .frame(width: 80, height: 100)
+//                                    .padding(.horizontal, 5)
+                                    .frame(width: 70)
                                     .glassEffect(.regular.tint(point.airport == airportsService.destinationAirport ? Color(hex: "FFAE17") : .clear))
                                     .padding(.horizontal, 5)
                                     .onTapGesture {
@@ -90,7 +95,7 @@ struct SelectAirportOverlay: View {
                         }
                     }
                     .scrollIndicators(.hidden)
-                    .frame(width: geometry.size.width, height: 100)
+                    .frame(height: 80)
                 }
             }
         }

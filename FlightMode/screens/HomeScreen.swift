@@ -61,7 +61,7 @@ struct HomeScreen : View {
         UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
     )
     
-    @State var tabHeight: Double = 180
+//    @State var tabHeight: Double = 180
     
     @EnvironmentObject var airportsService: AirportsService
     @EnvironmentObject var locationService: LocationService
@@ -130,48 +130,6 @@ struct HomeScreen : View {
                 currentTabShape = AnyShape(
                     CustomTab()
                 )
-            }
-        }
-        
-        switch currentTab {
-        case .home:
-            withAnimation(.linear) {
-                tabHeight = 180
-            }
-        case .flightAcademy:
-            withAnimation(.linear) {
-                tabHeight = 500
-            }
-        case .history:
-            withAnimation(.linear) {
-                tabHeight = 500
-            }
-        case .settings:
-            withAnimation(.linear) {
-                tabHeight = 500
-            }
-        case .flight(let flightWidgetType):
-            switch flightWidgetType {
-            case .setLocation:
-                withAnimation(.linear) {
-                    tabHeight = 500
-                }
-            case .selectAirport:
-                withAnimation(.linear) {
-                    tabHeight = 100
-                }
-            case .selectSeat:
-                withAnimation(.linear) {
-                    tabHeight = .infinity
-                }
-            case .ticket:
-                withAnimation(.linear) {
-                    tabHeight = .infinity
-                }
-            case .fly:
-                withAnimation(.linear) {
-                    tabHeight = .infinity
-                }
             }
         }
     }
@@ -398,16 +356,19 @@ struct HomeScreen : View {
                 VStack {
                     if let _overlayContent = overlayContent {
                         _overlayContent
-                        .frame(width: geometry.size.width, height: 180) // TODO: flexible size
+                            
+                            .frame(maxWidth: geometry.size.width) // TODO: flexible size
+                        .padding(.bottom, 20)
                     }
                     ZStack(alignment: .top) {
-                        tabWidgets[currentTab]
+                        let tabView = tabWidgets[currentTab]
                             .padding(.vertical, 30)
                             .frame(width: geometry.size.width)
-                            .frame(maxHeight: tabHeight)
                             .background(Color(hex: "2F2F2F").opacity(0.75))
                             .clipShape(currentTabShape)
                         if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport)].contains(currentTab) {
+                            tabView
+                                .frame(maxHeight: geometry.size.height * 0.5)
                             if #available(iOS 26, *) {
                                 Button(action: {
                                     openWidget(tabWidgetType: .home)
@@ -421,6 +382,8 @@ struct HomeScreen : View {
                                 .buttonStyle(.glass)
                                 .offset(y: -34)
                             }
+                        } else {
+                            tabView
                         }
                     }
                 }
