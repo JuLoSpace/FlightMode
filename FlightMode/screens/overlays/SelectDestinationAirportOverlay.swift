@@ -9,7 +9,7 @@
 import SwiftUI
 import CoreLocation
 
-struct SelectAirportOverlay: View {
+struct SelectDestinationAirportOverlay: View {
     
     @State private var activeId: Int? = 1
     
@@ -107,5 +107,5 @@ struct SelectAirportOverlay: View {
 
 
 #Preview {
-    SelectAirportOverlay()
+    SelectDestinationAirportOverlay()
 }

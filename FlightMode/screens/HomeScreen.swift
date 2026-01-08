@@ -54,6 +54,7 @@ struct HomeScreen : View {
         .flightAcademy: AnyView(FlightAcademyTab()),
         .history: AnyView(HistoryTab()),
         .settings: AnyView(SettingsTab()),
+        .flight(.fly): AnyView(FlyTab())
     ]
     
     @State var currentTab: TabWidgetType = TabWidgetType.home
@@ -109,7 +110,7 @@ struct HomeScreen : View {
                 currentTabShape = AnyShape(
                     UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
                 )
-                overlayContent = AnyView(SelectAirportOverlay())
+                overlayContent = AnyView(SelectDestinationAirportOverlay())
                 overlayScreen = nil
             case .selectSeat:
                 currentTabShape = AnyShape(
@@ -128,8 +129,10 @@ struct HomeScreen : View {
                 overlayScreen = AnyView(TicketScreen())
             case .fly:
                 currentTabShape = AnyShape(
-                    CustomTab()
+                    UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
                 )
+                overlayContent = AnyView(FlyOverlay())
+                overlayScreen = nil
             }
         }
     }
@@ -366,7 +369,7 @@ struct HomeScreen : View {
                             .frame(width: geometry.size.width)
                             .background(Color(hex: "2F2F2F").opacity(0.75))
                             .clipShape(currentTabShape)
-                        if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport)].contains(currentTab) {
+                        if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport), TabWidgetType.flight(.fly)].contains(currentTab) {
                             tabView
                                 .frame(maxHeight: geometry.size.height * 0.5)
                             if #available(iOS 26, *) {
