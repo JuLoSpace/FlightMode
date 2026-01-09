@@ -22,6 +22,7 @@ struct SelectAirportTab: View {
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .frame(height: 60)
+                        .frame(maxWidth: .infinity)
                 })
                 .frame(maxWidth: .infinity)
                 .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())

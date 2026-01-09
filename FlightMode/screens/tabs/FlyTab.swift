@@ -11,6 +11,8 @@ import SwiftUI
 
 struct FlyTab: View {
     
+    @EnvironmentObject var airportsService: AirportsService
+    
     var body: some View {
         VStack {
             VStack {
@@ -35,30 +37,42 @@ struct FlyTab: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 .frame(maxWidth: .infinity)
-                HStack {
-                    Text("58 MIN")
-                        .font(.custom("Wattauchimma", size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("836 KM/H")
-                        .font(.custom("Wattauchimma", size: 26))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    Text("3,808 KM")
-                        .font(.custom("Wattauchimma", size: 20))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                if let flight = airportsService.currentFlight {
+                    FlyTabInfo(flight: flight)
                 }
-                .frame(maxWidth: .infinity)
             }
+            .padding(.horizontal, 20)
             .frame(maxWidth: .infinity)
         }
+    }
+}
+
+struct FlyTabInfo: View {
+    
+    @ObservedObject var flight: Flight
+    
+    var body: some View {
+        HStack {
+            Text(TimeTranslate.secToString(flight.remainingTime))
+                .font(.custom("Wattauchimma", size: 20))
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("\(Int(flight.currentSpeed)) M/S")
+                .font(.custom("Wattauchimma", size: 26))
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .center)
+            Text("\(Int(flight.remainingDistance / 1000)) KM")
+                .font(.custom("Wattauchimma", size: 20))
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

@@ -24,9 +24,11 @@ struct HomeTab : View {
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                         .frame(height: 60)
+                        .frame(maxWidth: .infinity)
                 })
                 .frame(maxWidth: .infinity)
                 .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
+                .contentShape(.rect)
                 .padding(.horizontal, 20)
             }
             HStack {
@@ -35,8 +37,8 @@ struct HomeTab : View {
                         onTabCallback(TabWidgetType.home)
                     }, label: {
                         Image("home_tab")
+                            .frame(width: 70, height: 70)
                     })
-                    .frame(width: 70, height: 70)
                     .contentShape(.circle)
                     .glassEffect(.regular.tint(Color(hex: "FFAE17")).interactive())
                 }
@@ -45,8 +47,8 @@ struct HomeTab : View {
                         onTabCallback(TabWidgetType.flightAcademy)
                     }, label: {
                         Image("academy_tab")
+                            .frame(width: 70, height: 70)
                     })
-                    .frame(width: 70, height: 70)
                     .contentShape(.circle)
                     .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                 }
@@ -55,8 +57,8 @@ struct HomeTab : View {
                         onTabCallback(TabWidgetType.history)
                     }, label: {
                         Image("history_tab")
+                            .frame(width: 70, height: 70)
                     })
-                    .frame(width: 70, height: 70)
                     .contentShape(.circle)
                     .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                 }
@@ -65,8 +67,8 @@ struct HomeTab : View {
                         onTabCallback(TabWidgetType.settings)
                     }, label: {
                         Image("settings_tab")
+                            .frame(width: 70, height: 70)
                     })
-                    .frame(width: 70, height: 70)
                     .contentShape(.circle)
                     .glassEffect(.regular.tint(.white.opacity(0.1)).interactive())
                 }

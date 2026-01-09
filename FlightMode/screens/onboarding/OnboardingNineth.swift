@@ -160,6 +160,7 @@ struct OnboardingScreenNineth : View {
                 Spacer()
                 if #available(iOS 26, *) {
                     Button(action: {
+                        Storage.saveViewOnboarding(viewed: true)
                         withAnimation(.easeInOut(duration: 1)) {
                             step1 = 0
                         }
@@ -180,6 +181,7 @@ struct OnboardingScreenNineth : View {
                     .animation(nil, value: step)
                 } else {
                     Button(action: {
+                        Storage.saveViewOnboarding(viewed: true)
                         withAnimation(.easeInOut(duration: 1)) {
                             step1 = 0
                         }

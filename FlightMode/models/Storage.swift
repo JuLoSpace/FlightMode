@@ -40,4 +40,12 @@ class Storage {
     static func readDiscountDate() -> Date {
         return defaults.object(forKey: "discountDate") as? Date ?? Date()
     }
+    
+    static func readViewOnboarding() -> Bool {
+        return defaults.object(forKey: "viewOnboarding") as? Bool ?? false
+    }
+    
+    static func saveViewOnboarding(viewed: Bool) {
+        defaults.set(viewed, forKey: "viewOnboarding")
+    }
 }

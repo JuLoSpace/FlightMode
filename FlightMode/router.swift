@@ -13,6 +13,7 @@ enum Route : Hashable {
     case onboarding(OnboardingScreen)
     case paywall
     case promotionalPaywall
+    case home
     
     enum OnboardingScreen {
         case first

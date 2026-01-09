@@ -24,8 +24,23 @@ struct SelectDestinationAirportOverlay: View {
         }
     }
     
+    var onTabCallback: (TabWidgetType) -> ()
+    
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            let backButton = Button(action: {
+                onTabCallback(.home)
+            }, label: {
+                Image(systemName: "chevron.backward")
+                    .frame(width: 40, height: 40)
+            })
+            if #available(iOS 26, *) {
+                backButton
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.glass)
+                    .padding(.leading, 10)
+            }
+            Spacer()
             if #available(iOS 26, *) {
                 VStack {
                     GeometryReader { geometry in
@@ -35,12 +50,24 @@ struct SelectDestinationAirportOverlay: View {
                                     let hours = (m * 10) / 60
                                     let minutes = (m * 10) % 60
                                     let time: String = hours == 0 ? "\(minutes)m" : (minutes == 0 ? "\(hours)h" : "\(hours)h \(minutes)m")
-                                    Text(time)
-                                        .font(.custom("Montserrat", size: m == activeId ? 28 : 14))
-                                        .fontWeight(m == activeId ? .bold : .regular)
-                                        .frame(width: 100)
-                                        .foregroundStyle(m == activeId ? .white : .white.opacity(0.25))
-                                        .id(m)
+                                    VStack(spacing: 0) {
+                                        Text(time)
+                                            .font(.custom("Montserrat", size: m == activeId ? 24 : 14))
+                                            .fontWeight(m == activeId ? .bold : .regular)
+                                            .frame(width: 100)
+                                            .foregroundStyle(m == activeId ? .white : .white.opacity(0.25))
+                                            .onTapGesture {
+                                                withAnimation(.easeInOut(duration: 0.5)) {
+                                                    activeId = m
+                                                }
+                                            }
+                                            .frame(maxHeight: .infinity)
+                                            .padding(.top, 10)
+                                            .frame(alignment: .center)
+                                        Color.white
+                                            .frame(width: 1, height: 10)
+                                    }
+                                    .id(m)
                                 }
                             }
                             .scrollTargetLayout()
@@ -75,8 +102,10 @@ struct SelectDestinationAirportOverlay: View {
                                         Spacer()
                                         Text(time)
                                             .font(.custom("Montserrat", size: 16))
+                                            .multilineTextAlignment(.center)
                                             .fontWeight(.bold)
                                             .foregroundStyle(.white)
+                                            .padding(.horizontal, 10)
                                             .frame(width: 60, height: 60)
                                             .background(Color(hex: "3F3F3F"))
                                             .clipShape(.circle)
@@ -99,6 +128,7 @@ struct SelectDestinationAirportOverlay: View {
                 }
             }
         }
+        .frame(maxHeight: .infinity)
         .onAppear {
             updateAirports()
         }
@@ -107,5 +137,7 @@ struct SelectDestinationAirportOverlay: View {
 
 
 #Preview {
-    SelectDestinationAirportOverlay()
+    SelectDestinationAirportOverlay { _ in
+        
+    }
 }

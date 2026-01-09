@@ -48,28 +48,6 @@ class AirportPoint: Hashable {
     }
 }
 
-class Flight {
-    
-    let airportDeparture: Airport
-    let airportDestination: Airport
-    let timeDeparture: Date
-    var timeDestination: Date
-    var currentPosition: (lat: Double, lon: Double)?
-    var depart: Bool = false
-    
-    var timeToEnd: Double {
-        return 1 // TODO
-    }
-    
-    init(airportDeparture: Airport, airportDestination: Airport, timeDeparture: Date, timeDestination: Date) {
-        self.airportDeparture = airportDeparture
-        self.airportDestination = airportDestination
-        self.timeDeparture = timeDeparture
-        self.timeDestination = timeDestination
-        self.currentPosition = (airportDeparture.lat, airportDeparture.lon)
-    }
-}
-
 class AirportsService: ObservableObject {
     
     @Published private(set) var airports: [Airport] = []
@@ -81,10 +59,7 @@ class AirportsService: ObservableObject {
     @Published var destinationAirport: Airport?
     @Published private(set) var selectedTime: Double?
     
-    let timeDelta: Double = 300.0 // in seconds
-    let airplaneAverageSpeed: Double = 230 // m/s
-    
-    var mapMoveCallback: ((_ lat: Double, _ lon: Double, _ delta: Double) -> ())?
+    @Published private(set) var currentFlight: Flight?
     
     init() {
         load()
@@ -118,35 +93,13 @@ class AirportsService: ObservableObject {
         }).prefix(100))
     }
     
-    func distance(a: Airport, b: Airport) -> Double {
-        let earthRadiusKm: Double = 6371.0
-        
-        let dLat = (b.lat - a.lat) * .pi / 180
-        let dLon = (b.lon - a.lon) * .pi / 180
-        
-        let c: Double = sin(dLat / 2) * sin(dLat / 2) + cos(a.lat * .pi / 180) * cos(b.lat * .pi / 180) * sin(dLon / 2) * sin(dLon / 2)
-        
-        return 2 * 1000 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
-    }
-    
-    func distance(lat: Double, lon: Double, b: Airport) -> Double {
-        let earthRadiusKm: Double = 6371.0
-        
-        let dLat = (b.lat - lat) * .pi / 180
-        let dLon = (b.lon - lon) * .pi / 180
-        
-        let c: Double = sin(dLat / 2) * sin(dLat / 2) + cos(lat * .pi / 180) * cos(b.lat * .pi / 180) * sin(dLon / 2) * sin(dLon / 2)
-        
-        return 2 * 1000 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
-    }
-    
     func findNearestAirport(lat: Double, lon: Double) -> Airport? {
         
         var a: Airport?
         var dist: Double = .infinity
         
         for airport in airports {
-            let d: Double = distance(lat: lat, lon: lon, b: airport)
+            let d: Double = MetricsService.distance(lat: lat, lon: lon, b: airport)
             if (d < dist) {
                 dist = d
                 a = airport
@@ -173,8 +126,8 @@ class AirportsService: ObservableObject {
                 selectedTime = time
                 var airportPoints: [AirportPoint] = []
                 for airport in airports {
-                    let d: Double = distance(a: a, b: airport)
-                    let time: Double = d / airplaneAverageSpeed // time to fly in seconds
+                    let d: Double = MetricsService.distance(a: a, b: airport)
+                    let time: Double = d / MetricsService.airplaneAverageSpeed // time to fly in seconds
                     let point: AirportPoint = AirportPoint(airport: airport, nearest: false, time: time)
                     airportPoints.append(point)
                 }
@@ -182,7 +135,7 @@ class AirportsService: ObservableObject {
                     return abs(a.time - time) < abs(b.time - time)
                 })
                 airportPoints.removeAll(where: { point in
-                    abs(point.time - time) > timeDelta
+                    abs(point.time - time) > MetricsService.timeDelta
                 })
                 airportPoints.sort(by: { a, b in
                     return a.time < b.time
@@ -192,8 +145,8 @@ class AirportsService: ObservableObject {
                     bestAirport.nearest = true
                 }
                 self.showableAirports = airportPoints
-                if let mapCallback = mapMoveCallback {
-                    mapCallback(a.lat, a.lon, 1.5 * 360.0 * time * airplaneAverageSpeed / (6371000.0 * .pi))
+                if let mapCallback = MapService.mapMoveCallback {
+                    mapCallback(a.lat, a.lon, 1.5 * 360.0 * time * MetricsService.airplaneAverageSpeed / (6371000.0 * .pi), 2.0)
                 }
             }
         }
@@ -205,5 +158,33 @@ class AirportsService: ObservableObject {
     
     func selectDestinationAirport(_ airport: Airport) {
         self.destinationAirport = airport
+    }
+    
+    func flight() {
+        
+        guard let departureAirport = departureAirport else { return }
+        guard let destinationAirport = destinationAirport else { return }
+        
+        showableAirports = []
+        
+        let middleLat: Double = (departureAirport.lat + destinationAirport.lat) / 2.0
+        let middleLon: Double = (departureAirport.lon + destinationAirport.lon) / 2.0
+        
+        let latDelta = abs(departureAirport.lat - destinationAirport.lat)
+        let lonDelta = abs(departureAirport.lon - destinationAirport.lon)
+        
+        let delta = max(latDelta, lonDelta) * 1.5
+        
+        if let mapMoveCallback = MapService.mapMoveCallback {
+            mapMoveCallback(middleLat, middleLon, delta, 2.0)
+        }
+        
+        let newFlight = Flight(
+            flightProcess: FlightProcess(flightType: .planned),
+            airportDeparture: departureAirport,
+            airportDestination: destinationAirport)
+        
+        currentFlight = newFlight
+        newFlight.startFlight()
     }
 }

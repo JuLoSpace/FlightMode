@@ -54,7 +54,7 @@ struct SettingsTab : View {
             SettingsButton(name: "Challenge updates", type: ButtonType.toggle, onButtonTap: {})
         ],
         "Subscription": [
-            SettingsButton(name: "Manage Subscriation", type: ButtonType.widget, onButtonTap: {}),
+            SettingsButton(name: "Manage Subscription", type: ButtonType.widget, onButtonTap: {}),
             SettingsButton(name: "Restore purchases", type: ButtonType.widget, onButtonTap: {}),
         ],
         "About": [

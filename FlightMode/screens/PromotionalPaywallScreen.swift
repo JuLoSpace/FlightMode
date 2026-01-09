@@ -295,7 +295,7 @@ struct PromotionalPaywallScreen : View {
                     .padding(.bottom, 10)
                 }
                 Button(action: {
-                    
+                    router.navigate(to: .home)
                 }, label: {
                     Text("No, thanks")
                         .font(.custom("Montserrat", size: 20))

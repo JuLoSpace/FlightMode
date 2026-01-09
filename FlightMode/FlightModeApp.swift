@@ -33,6 +33,7 @@ struct FlightModeApp: App {
     @StateObject private var locationService = LocationService()
     
     var body: some Scene {
+        
         WindowGroup {
             NavigationStack(path: $router.path) {
                 HomeScreen()
@@ -64,6 +65,8 @@ struct FlightModeApp: App {
                                 PaywallScreen()
                             case .promotionalPaywall:
                                 PromotionalPaywallScreen()
+                            case .home:
+                                HomeScreen()
                             }
                         }
                         .navigationBarBackButtonHidden(true)
@@ -76,6 +79,11 @@ struct FlightModeApp: App {
             .environmentObject(user)
             .environmentObject(airportsService)
             .environmentObject(locationService)
+            .onAppear {
+                if !Storage.readViewOnboarding() {
+                    router.navigate(to: .onboarding(.first))
+                }
+            }
         }
     }
 }

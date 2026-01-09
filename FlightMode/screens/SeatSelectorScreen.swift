@@ -111,6 +111,7 @@ struct SeatSelectorScreen: View {
     @State var selectedMission: Mission?
     
     @EnvironmentObject var user: UserModel
+    @EnvironmentObject var airportsService: AirportsService
     
     @State var letsGoOffset: Double = 50
     
@@ -248,67 +249,60 @@ struct SeatSelectorScreen: View {
                         }
                         .frame(width: geometry.size.width * 0.6, alignment: .bottom)
                         .padding(.bottom, 10)
-                        if #available(iOS 26, *) {
-                            let btnSize: Double = 50.0
-                            GeometryReader { buttonGeometry in
-                                ZStack(alignment: .center) {
-                                    VStack {
-                                        Image("letsGo_2")
-                                            .frame(width: btnSize, height: btnSize)
-                                    }
-                                    .frame(width: buttonGeometry.size.width, alignment: .trailing)
-                                    VStack {
-                                        Text("Let's go")
-                                            .font(.custom("Montserrat", size: 20))
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.white)
-                                    }
-                                    .frame(width: buttonGeometry.size.width, alignment: .center)
-                                    ZStack(alignment: .trailing) {
-                                        Color(hex: "FFAE17")
-                                            .frame(width: letsGoOffset, alignment: .leading)
-                                            .cornerRadius(btnSize / 2)
-                                        Image("letsGo_1")
-                                            .frame(width: btnSize, height: btnSize)
-                                            .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
-                                    }
-                                    .frame(width: buttonGeometry.size.width, alignment: .leading)
-                                    .gesture(DragGesture().onChanged { value in
-                                        letsGoOffset = value.location.x
-                                    }.onEnded { value in
-                                        if value.location.x >= buttonGeometry.size.width / 2 {
-                                            withAnimation(.easeInOut) {
-                                                letsGoOffset = buttonGeometry.size.width
-                                            }
-                                            onTabCallback(.flight(.fly))
-                                        } else {
-                                            withAnimation(.easeInOut) {
-                                                letsGoOffset = btnSize
-                                            }
+                        if let _ = selectedSeat, let _ = selectedMission {
+                            if #available(iOS 26, *) {
+                                let btnSize: Double = 50.0
+                                GeometryReader { buttonGeometry in
+                                    ZStack(alignment: .center) {
+                                        VStack {
+                                            Image("letsGo_2")
+                                                .frame(width: btnSize, height: btnSize)
                                         }
-                                        
-                                    })
+                                        .frame(width: buttonGeometry.size.width, alignment: .trailing)
+                                        VStack {
+                                            Text("Let's go")
+                                                .font(.custom("Montserrat", size: 20))
+                                                .fontWeight(.bold)
+                                                .foregroundStyle(.white)
+                                        }
+                                        .frame(width: buttonGeometry.size.width, alignment: .center)
+                                        ZStack(alignment: .trailing) {
+                                            Color(hex: "FFAE17")
+                                                .frame(width: letsGoOffset, alignment: .leading)
+                                                .cornerRadius(btnSize / 2)
+                                            Image("letsGo_1")
+                                                .frame(width: btnSize, height: btnSize)
+                                                .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                                        }
+                                        .frame(width: buttonGeometry.size.width, alignment: .leading)
+                                        .gesture(DragGesture().onChanged { value in
+                                            letsGoOffset = value.location.x
+                                        }.onEnded { value in
+                                            if value.location.x >= buttonGeometry.size.width / 2 {
+                                                withAnimation(.easeInOut) {
+                                                    letsGoOffset = buttonGeometry.size.width
+                                                }
+                                                airportsService.flight()
+                                                onTabCallback(.flight(.fly))
+                                            } else {
+                                                withAnimation(.easeInOut) {
+                                                    letsGoOffset = btnSize
+                                                }
+                                            }
+                                            
+                                        })
+                                        .sensoryFeedback(.impact(weight: .light), trigger: letsGoOffset)
+                                    }
                                 }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .frame(width: max(geometry.size.width - 40, 0), height: 60, alignment: .leading)
+                                .glassEffect(.regular)
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .frame(width: max(geometry.size.width - 40, 0), height: 60, alignment: .leading)
-                            .glassEffect(.regular)
+                        } else {
+                            Color.clear
+                                .frame(height: 60)
                         }
-//                        if #available(iOS 26, *) {
-//                            Button(action: {
-//                                onTabCallback(TabWidgetType.flight(.ticket))
-//                            }, label: {
-//                                Text("Continue")
-//                                    .font(.custom("Montserrat", size: 20))
-//                                    .fontWeight(.bold)
-//                                    .foregroundStyle(.white)
-//                                    .frame(height: 60)
-//                            })
-//                            .frame(width: max(geometry.size.width - 40, 0))
-//                            .glassEffect(.regular.tint(Color(hex: (selectedMission != nil && selectedSeat != nil) ? "FFAE17" : "3D3D3D")).interactive())
-//                            .padding(.horizontal, 20)
-//                        }
                     }
                     if let selectedSeat = selectedSeat, let frame = seatFrames[selectedSeat] {
                         let offset: Double = geometry.size.width * 0.2

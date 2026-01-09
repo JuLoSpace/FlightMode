@@ -6,58 +6,82 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 enum FlyStyle {
     case map
     case cockpit
 }
 
-struct FlyOverlay: View {
+struct ButtonsView: View {
     
-    @State var selectedFlyStyle: FlyStyle = FlyStyle.map
+    @ObservedObject var flight: Flight
+    @State var track: Bool = false
     
     var body: some View {
-        VStack {
-            HStack(alignment: .top) {
-                let pauseButton = Button(action: {
+        HStack(alignment: .top) {
+            let pauseButton = Button(action: {
+                
+            }, label: {
+                Image("pause")
+                    .frame(width: 50, height: 50)
+            })
+            if #available(iOS 26, *) {
+                pauseButton
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.glass)
+            }
+            Spacer()
+            HStack {
+                let musicButton = Button(action: {
                     
                 }, label: {
-                    Image("pause")
+                    Image("music")
                         .frame(width: 50, height: 50)
                 })
                 if #available(iOS 26, *) {
-                    pauseButton
+                    musicButton
                         .buttonBorderShape(.circle)
                         .buttonStyle(.glass)
                 }
-                Spacer()
-                HStack {
-                    let musicButton = Button(action: {
-                        
-                    }, label: {
-                        Image("music")
-                            .frame(width: 50, height: 50)
-                    })
-                    if #available(iOS 26, *) {
-                        musicButton
-                            .buttonBorderShape(.circle)
-                            .buttonStyle(.glass)
-                    }
-                    
-                    let locationButton = Button(action: {
-                        
-                    }, label: {
-                        Image("location")
-                            .frame(width: 50, height: 50)
-                    })
-                    if #available(iOS 26, *) {
-                        locationButton
-                            .buttonBorderShape(.circle)
-                            .buttonStyle(.glass)
+                
+                let locationButton = Button(action: {
+                    track = true
+                }, label: {
+                    Image("location")
+                        .frame(width: 50, height: 50)
+                })
+                if #available(iOS 26, *) {
+                    locationButton
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(.glass)
+                }
+            }
+        }
+        .onChange(of: flight.flightProcess.position) { _, newValue in
+            if track {
+                if let pos = newValue {
+                    if let mapCallback = MapService.mapMoveCallback {
+                        mapCallback(pos.latitude, pos.longitude, 1.0, .zero)
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct FlyOverlay: View {
+    
+    @State var selectedFlyStyle: FlyStyle = FlyStyle.map
+    @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var airportsService: AirportsService
+    
+    var body: some View {
+        VStack {
+            if let flight = airportsService.currentFlight {
+                ButtonsView(flight: flight)
+            }
             Spacer()
             let selectFlyStyleWidth: Double = 280
             let selectFlyStyle = ZStack {
@@ -93,7 +117,7 @@ struct FlyOverlay: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.leading, selectFlyStyleWidth / 2)
                 .onTapGesture {
-                    selectedFlyStyle = .cockpit
+//                    selectedFlyStyle = .cockpit
                 }
             }
             .frame(width: selectFlyStyleWidth, height: 60)
