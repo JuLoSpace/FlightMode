@@ -10,6 +10,10 @@ import SwiftUI
 
 
 struct DestinationOverlay: View {
+    
+    @EnvironmentObject var airportsService: AirportsService
+    var onTabCallback: (TabWidgetType) -> ()
+    
     var body: some View {
         VStack(alignment: .leading) {
             ZStack(alignment: .topLeading) {
@@ -28,8 +32,10 @@ struct DestinationOverlay: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                     Spacer()
-                    TicketView(width: .infinity, height: 200)
-                        .padding(.horizontal, 20)
+                    if let flight = airportsService.currentFlight {
+                        TicketView(width: .infinity, height: 200, flight: flight)
+                            .padding(.horizontal, 20)
+                    }
                     Text("Rewards earned")
                         .font(.custom("Montserrat", size: 14))
                         .foregroundStyle(.white)
@@ -122,6 +128,8 @@ struct DestinationOverlay: View {
                         .padding(.horizontal, 20)
                         if #available(iOS 26, *) {
                             Button(action: {
+                                onTabCallback(TabWidgetType.home)
+                                airportsService.cancel()
                             }, label: {
                                 Text("Continue")
                                     .font(.custom("Montserrat", size: 20))
@@ -145,5 +153,7 @@ struct DestinationOverlay: View {
 
 
 #Preview {
-    DestinationOverlay()
+    DestinationOverlay { _ in
+        
+    }
 }

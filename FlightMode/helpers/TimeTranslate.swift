@@ -12,12 +12,26 @@ class TimeTranslate {
         let secs: Int = Int(seconds)
         let m: Int = secs / 60
         let h: Int = m / 60
+        let s: Int = secs % 60
         let minutes = m % 60
         var out: String = ""
         if (h > 0) {
             out += "\(h) H"
         }
-        out += "\(minutes) MIN"
+        if (m > 0) {
+            if out != "" {
+                out += " \(minutes) M"
+            } else {
+                out = "\(minutes) M"
+            }
+        }
+        if (h == 0) {
+            if out != "" {
+                out += " \(s) s"
+            } else {
+                out = "\(s) s"
+            }
+        }
         return out
     }
 }

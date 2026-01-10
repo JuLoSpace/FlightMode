@@ -31,6 +31,7 @@ struct FlightModeApp: App {
     @StateObject private var user = UserModel()
     @StateObject private var airportsService = AirportsService()
     @StateObject private var locationService = LocationService()
+    @StateObject private var settingsService = Storage.readSettings()
     
     var body: some Scene {
         
@@ -79,6 +80,7 @@ struct FlightModeApp: App {
             .environmentObject(user)
             .environmentObject(airportsService)
             .environmentObject(locationService)
+            .environmentObject(settingsService)
             .onAppear {
                 if !Storage.readViewOnboarding() {
                     router.navigate(to: .onboarding(.first))

@@ -61,6 +61,10 @@ class AirportsService: ObservableObject {
     
     @Published private(set) var currentFlight: Flight?
     
+    @Published var historyFlights: [Flight]?
+    
+    var onFlightEndCallback: (() -> ())?
+    
     init() {
         load()
     }
@@ -79,9 +83,15 @@ class AirportsService: ObservableObject {
                 airport.iata == nil || airport.name == nil || airport.iata == "" || airport.icao == ""
             })
             getCityAirports()
+            loadHistoryFlights()
         } catch {
             
         }
+    }
+    
+    func loadHistoryFlights() {
+        historyFlights = Storage.readFlights(airports: airports)
+        print(historyFlights?.count)
     }
     
     func search(_ query: String) -> [Airport] {
@@ -146,7 +156,7 @@ class AirportsService: ObservableObject {
                 }
                 self.showableAirports = airportPoints
                 if let mapCallback = MapService.mapMoveCallback {
-                    mapCallback(a.lat, a.lon, 1.5 * 360.0 * time * MetricsService.airplaneAverageSpeed / (6371000.0 * .pi), 2.0)
+                    mapCallback(a.lat, a.lon, 1.5 * 360.0 * time * MetricsService.airplaneAverageSpeed / (6371000.0 * .pi), 2.0, 0)
                 }
             }
         }
@@ -160,12 +170,24 @@ class AirportsService: ObservableObject {
         self.destinationAirport = airport
     }
     
+    func cancel() {
+        
+        departureAirport = nil
+        destinationAirport = nil
+        
+        showableAirports = []
+        selectedTime = nil
+        
+        currentFlight = nil
+    }
+    
     func flight() {
         
         guard let departureAirport = departureAirport else { return }
         guard let destinationAirport = destinationAirport else { return }
         
         showableAirports = []
+        selectedTime = nil
         
         let middleLat: Double = (departureAirport.lat + destinationAirport.lat) / 2.0
         let middleLon: Double = (departureAirport.lon + destinationAirport.lon) / 2.0
@@ -176,7 +198,7 @@ class AirportsService: ObservableObject {
         let delta = max(latDelta, lonDelta) * 1.5
         
         if let mapMoveCallback = MapService.mapMoveCallback {
-            mapMoveCallback(middleLat, middleLon, delta, 2.0)
+            mapMoveCallback(middleLat, middleLon, delta, 2.0, 0)
         }
         
         let newFlight = Flight(
@@ -186,5 +208,22 @@ class AirportsService: ObservableObject {
         
         currentFlight = newFlight
         newFlight.startFlight()
+        
+        newFlight.onFlightEndCallback = endFlight
+        
+        if let move = MapService.mapMoveToAirplanePosition {
+            move()
+        }
+    }
+    
+    func endFlight() {
+        if let currentFlight = currentFlight {
+            Storage.saveFlight(flight: currentFlight)
+            historyFlights?.append(currentFlight)
+        }
+        if let onFlightEndCallback = onFlightEndCallback {
+            onFlightEndCallback()
+        }
+//        currentFlight = nil
     }
 }

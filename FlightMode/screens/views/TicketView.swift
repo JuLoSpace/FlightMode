@@ -60,20 +60,20 @@ struct TicketView: View {
 
     var width: Double
     var height: Double
-//    var flight: Flight
+    var flight: Flight
 
     var body: some View {
         ZStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top) {
-                        Text("CYT")
-                            .font(.custom("Montserrat", size: 40))
+                        Text(flight.airportDeparture.icao)
+                            .font(.custom("Montserrat", size: 28))
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         VStack(spacing: 0) {
-                            Text("Success")
+                            Text("\(flight.flightProcess.flightType)")
                                 .font(.custom("Montserrat", size: 14))
                                 .fontWeight(.bold)
                                 .foregroundStyle(Color(hex: "3EC632"))
@@ -90,26 +90,30 @@ struct TicketView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        Text("ORT")
-                            .font(.custom("Montserrat", size: 40))
+                        Text(flight.airportDestination.icao)
+                            .font(.custom("Montserrat", size: 28))
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                     .padding(.horizontal, 30)
                     HStack {
-                        Text("Yakataga")
-                            .font(.custom("Montserrat", size: 14))
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white.opacity(0.25))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("1 h 18 m")
-                            .font(.custom("Montserrat", size: 14))
-                            .fontWeight(.bold)
-                            .foregroundStyle(.white.opacity(0.5))
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text("Ketchikan")
+                        if let city = flight.airportDeparture.city {
+                            Text("\(city)")
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white.opacity(0.25))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        if let timeDestination = flight.timeDestination, let timeDeparture = flight.timeDeparture {
+                            Text(TimeTranslate.secToString(timeDestination.timeIntervalSince(timeDeparture)))
+                                .font(.custom("Montserrat", size: 14))
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white.opacity(0.5))
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                        if let city = flight.airportDestination.city {
+                            Text("\(city)")
                                 .font(.custom("Montserrat", size: 14))
                                 .fontWeight(.bold)
                                 .foregroundStyle(.white.opacity(0.25))
@@ -120,7 +124,7 @@ struct TicketView: View {
                     DottedLine().stroke(
                         style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [2, 16])
                     )
-                    .frame(width: width - 60, height: 1)
+                    .frame(width: max(width - 60, 0), height: 1)
                     .padding(.horizontal, 30)
                     .foregroundStyle(.white.opacity(0.05))
                     .frame(width: width, height: 20, alignment: .bottom)
@@ -136,7 +140,7 @@ struct TicketView: View {
                     DottedLine().stroke(
                         style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [2, 16])
                     )
-                    .frame(width: width - 60, height: 1, alignment: .top)
+                    .frame(width: max(width - 60, 0), height: 1, alignment: .top)
                     .padding(.horizontal, 30)
                     .foregroundStyle(.white.opacity(0.05))
                     Spacer()
@@ -144,16 +148,18 @@ struct TicketView: View {
                         HStack(spacing: 2) {
                             Image("date")
                                 .font(.system(size: 20))
-                            Text("14:59")
-                                .font(.custom("Montserrat", size: 18))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
+                            if let timeDeparture = flight.timeDeparture {
+                                Text(timeDeparture, format: .dateTime.hour().minute())
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         HStack(spacing: 2) {
                             Image("place")
                                 .font(.system(size: 20))
-                            Text("829 km")
+                            Text("\(Int(MetricsService.distance(a: flight.airportDeparture, b: flight.airportDestination) / 1000)) km")
                                 .font(.custom("Montserrat", size: 18))
                                 .fontWeight(.bold)
                                 .foregroundStyle(.white)
@@ -162,10 +168,12 @@ struct TicketView: View {
                         HStack(spacing: 2) {
                             Image("date")
                                 .font(.system(size: 20))
-                            Text("14:59")
-                                .font(.custom("Montserrat", size: 18))
-                                .fontWeight(.bold)
-                                .foregroundStyle(.white)
+                            if let timeDestination = flight.timeDestination {
+                                Text(timeDestination, format: .dateTime.hour().minute())
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white)
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
                     }
@@ -205,4 +213,13 @@ struct TicketView: View {
             }
         }
     }
+}
+
+
+#Preview {
+    TicketView(width: 400, height: 200, flight: Flight(flightProcess: FlightProcess(flightType: .success, position: Position(latitude: 0.0, longitude: 0.0)), airportDeparture: Airport(icao: "CYT", iata: nil, name: "Yakataga", city: "Yakataga", country: nil, elevation: nil, lat: 0.0, lon: 0.0, tz: nil), airportDestination: Airport(icao: "ORT", iata: nil, name: "Ketchikan", city: "Ketchikan", country: nil, elevation: nil, lat: 0.0, lon: 0.0, tz: nil), timeDeparture: Date.now, timeDestination: Date.now, id: UUID()))
+}
+
+#Preview {
+    TicketView(width: 400, height: 200, flight: Flight(flightProcess: FlightProcess(flightType: .cancelled, position: Position(latitude: 0.0, longitude: 0.0)), airportDeparture: Airport(icao: "CYT", iata: nil, name: "Yakataga", city: "Yakataga", country: nil, elevation: nil, lat: 0.0, lon: 0.0, tz: nil), airportDestination: Airport(icao: "ORT", iata: nil, name: "Ketchikan", city: "Ketchikan", country: nil, elevation: nil, lat: 0.0, lon: 0.0, tz: nil), timeDeparture: Date.now, timeDestination: Date.now, id: UUID()))
 }

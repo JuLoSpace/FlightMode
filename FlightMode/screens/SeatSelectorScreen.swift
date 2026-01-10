@@ -283,7 +283,7 @@ struct SeatSelectorScreen: View {
                                                     letsGoOffset = buttonGeometry.size.width
                                                 }
                                                 airportsService.flight()
-                                                onTabCallback(.flight(.fly))
+                                                onTabCallback(.flight(.fly(.map)))
                                             } else {
                                                 withAnimation(.easeInOut) {
                                                     letsGoOffset = btnSize

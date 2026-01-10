@@ -43,6 +43,7 @@ class MetricsService {
         return 2 * 1000 * earthRadiusKm * atan2(sqrt(c), sqrt(1-c))
     }
     
+    // In degrees
     static func heading(lat1: Double, lon1: Double, lat2: Double, lon2: Double) -> Double {
         let dLon = lon2 - lon1
         

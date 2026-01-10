@@ -11,6 +11,7 @@ import Combine
 
 class MapService: ObservableObject {
     
-    static var mapMoveCallback: ((_ lat: Double, _ lon: Double, _ delta: Double, _ duration: Double) -> ())?
+    static var mapMoveCallback: ((_ lat: Double, _ lon: Double, _ delta: Double, _ duration: Double, _ heading: Double) -> ())?
     
+    static var mapMoveToAirplanePosition: (() -> ())?
 }

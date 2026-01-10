@@ -12,6 +12,7 @@ enum TabWidgetType: Hashable {
     case history
     case settings
     case flight(FlightWidgetType)
+    case avatar
 }
 
 enum FlightWidgetType: Hashable {
@@ -19,5 +20,13 @@ enum FlightWidgetType: Hashable {
     case selectAirport
     case selectSeat
     case ticket
-    case fly
+    case fly(FlyWidgetType)
+    case destination
+}
+
+enum FlyWidgetType: Hashable {
+    case map
+    case cockpit
+    case music
+    case pause
 }

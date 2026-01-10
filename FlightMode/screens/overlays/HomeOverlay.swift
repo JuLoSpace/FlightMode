@@ -10,6 +10,8 @@ import SwiftUI
 
 struct HomeOverlay: View {
     
+    @EnvironmentObject var settingsService: SettingsService
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
@@ -19,10 +21,12 @@ struct HomeOverlay: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
-                    Text("USER")
-                        .font(.custom("Montserrat", size: 36))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
+                    if let name = settingsService.name {
+                        Text(name)
+                            .font(.custom("Montserrat", size: 36))
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                    }
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {

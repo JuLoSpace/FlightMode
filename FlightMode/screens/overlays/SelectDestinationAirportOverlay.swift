@@ -29,6 +29,7 @@ struct SelectDestinationAirportOverlay: View {
     var body: some View {
         VStack(alignment: .leading) {
             let backButton = Button(action: {
+                airportsService.cancel()
                 onTabCallback(.home)
             }, label: {
                 Image(systemName: "chevron.backward")

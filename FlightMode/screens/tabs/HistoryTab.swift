@@ -25,11 +25,25 @@ enum HistoryType: CaseIterable {
             return "Year"
         }
     }
+    
+    func getSeconds() -> Int {
+        switch self {
+        case .total:
+            return Int(1e18)
+        case .week:
+            return 7 * 24 * 3600
+        case .month:
+            return 30 * 7 * 24 * 3600
+        case .year:
+            return 365 * 7 * 24 * 3600
+        }
+    }
 }
 
 struct HistoryTab : View {
     
     @State var selectedHistoryType: HistoryType = HistoryType.total
+    @EnvironmentObject var airportsService: AirportsService
     
     var body: some View {
         GeometryReader { geometry in
@@ -62,7 +76,18 @@ struct HistoryTab : View {
                     }
                     .frame(width: geometry.size.width - 40, alignment: .leading)
                     .padding(.horizontal, 20)
-                    
+                    if let flights = airportsService.historyFlights {
+                        let showable: [Flight] = flights.filter {
+                            if let timeDestination = $0.timeDestination {
+                                return Int(Date.now.timeIntervalSince(timeDestination)) < selectedHistoryType.getSeconds()
+                            }
+                            return false
+                        }
+                        ForEach(showable, id: \.self) { flight in
+                            TicketView(width: .infinity, height: 200, flight: flight)
+                                .padding(.horizontal, 20)
+                        }
+                    }
                 }
             }
         }

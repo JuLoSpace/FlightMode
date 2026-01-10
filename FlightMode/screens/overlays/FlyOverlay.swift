@@ -15,13 +15,15 @@ enum FlyStyle {
 
 struct ButtonsView: View {
     
+    var onTabCallback: (TabWidgetType) -> ()
+    
     @ObservedObject var flight: Flight
-    @State var track: Bool = false
+    @Binding var track: Bool
     
     var body: some View {
         HStack(alignment: .top) {
             let pauseButton = Button(action: {
-                
+                onTabCallback(TabWidgetType.flight(.fly(.pause)))
             }, label: {
                 Image("pause")
                     .frame(width: 50, height: 50)
@@ -34,7 +36,7 @@ struct ButtonsView: View {
             Spacer()
             HStack {
                 let musicButton = Button(action: {
-                    
+                    onTabCallback(TabWidgetType.flight(.fly(.music)))
                 }, label: {
                     Image("music")
                         .frame(width: 50, height: 50)
@@ -62,9 +64,13 @@ struct ButtonsView: View {
             if track {
                 if let pos = newValue {
                     if let mapCallback = MapService.mapMoveCallback {
-                        mapCallback(pos.latitude, pos.longitude, 1.0, .zero)
+                        mapCallback(pos.latitude, pos.longitude, 0.2, .zero, MetricsService.heading(lat1: flight.airportDeparture.lat, lon1: flight.airportDeparture.lon, lat2: flight.airportDestination.lat, lon2: flight.airportDestination.lon))
                     }
                 }
+            }
+        }.onChange(of: flight.flightProcess.flightType) { _, newValue in
+            if [FlightType.success, FlightType.cancelled].contains(newValue) {
+                onTabCallback(TabWidgetType.flight(.destination))
             }
         }
         .frame(maxWidth: .infinity)
@@ -73,14 +79,18 @@ struct ButtonsView: View {
 
 struct FlyOverlay: View {
     
+    var flyWidgetType: FlyWidgetType
+    
     @State var selectedFlyStyle: FlyStyle = FlyStyle.map
     @EnvironmentObject var locationService: LocationService
     @EnvironmentObject var airportsService: AirportsService
+    @Binding var track: Bool
+    var onTabCallback: (TabWidgetType) -> ()
     
     var body: some View {
         VStack {
             if let flight = airportsService.currentFlight {
-                ButtonsView(flight: flight)
+                ButtonsView(onTabCallback: onTabCallback, flight: flight, track: $track)
             }
             Spacer()
             let selectFlyStyleWidth: Double = 280
@@ -132,5 +142,7 @@ struct FlyOverlay: View {
 
 
 #Preview {
-    FlyOverlay()
+    @State var track = true
+    var type = FlyWidgetType.map
+    FlyOverlay(flyWidgetType: type, track: $track, onTabCallback: { _ in })
 }

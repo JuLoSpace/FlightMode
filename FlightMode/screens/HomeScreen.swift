@@ -37,7 +37,7 @@ struct HomeScreen : View {
         .flightAcademy: AnyView(FlightAcademyTab()),
         .history: AnyView(HistoryTab()),
         .settings: AnyView(SettingsTab()),
-        .flight(.fly): AnyView(FlyTab())
+        .flight(.fly(.map)): AnyView(FlyTab()),
     ]
     
     @State var currentTab: TabWidgetType = TabWidgetType.home
@@ -45,15 +45,15 @@ struct HomeScreen : View {
         UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
     )
     
-//    @State var tabHeight: Double = 180
-    
     @EnvironmentObject var airportsService: AirportsService
     @EnvironmentObject var locationService: LocationService
+    @EnvironmentObject var settingsService: SettingsService
     
     @State var overlayContent: AnyView?
     @State var overlayScreen: AnyView? = AnyView(HomeOverlay())
     
     @State var tabHeight: Double?
+    @State var track: Bool = false
     
     func openWidget(tabWidgetType: TabWidgetType) {
         currentTab = tabWidgetType
@@ -114,20 +114,42 @@ struct HomeScreen : View {
                 )
                 overlayContent = nil
 //                overlayScreen = AnyView(TicketScreen())
-            case .fly:
-                currentTabShape = AnyShape(
-                    UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
-                )
-                overlayContent = AnyView(FlyOverlay())
-                overlayScreen = nil
+            case .fly(let flyWidgetType):
+                switch flyWidgetType {
+                case .map:
+                    currentTabShape = AnyShape(
+                        UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
+                    )
+                    overlayContent = AnyView(FlyOverlay(flyWidgetType: flyWidgetType, track: $track, onTabCallback: { type in
+                        openWidget(tabWidgetType: type)
+                    }))
+                    overlayScreen = nil
+                case .pause:
+                    overlayScreen = nil
+                case .cockpit:
+                    overlayScreen = nil
+                case .music:
+                    overlayScreen = nil
+                }
+            case .destination:
+                overlayScreen = AnyView(DestinationOverlay(onTabCallback: { type in
+                    openWidget(tabWidgetType: type)
+                }))
+                overlayContent = nil
             }
+        case .avatar:
+            overlayScreen = AnyView(ChooseAvatarScreen(onTabCallback: { type in
+                openWidget(tabWidgetType: type)
+            }))
         }
     }
     
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .topLeading) {
-                MapScreen()
+                MapScreen(onTabCallback: { type in
+                    openWidget(tabWidgetType: type)
+                }, track: $track)
                 VStack {
                     
                 }
@@ -148,7 +170,7 @@ struct HomeScreen : View {
                             .frame(width: geometry.size.width)
                             .background(Color(hex: "2F2F2F").opacity(0.75))
                             .clipShape(currentTabShape)
-                        if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport), TabWidgetType.flight(.fly)].contains(currentTab) {
+                        if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport), TabWidgetType.flight(.fly(.map))].contains(currentTab) {
                             tabView
                                 .frame(maxHeight: geometry.size.height * 0.5)
                             if #available(iOS 26, *) {
@@ -188,6 +210,13 @@ struct HomeScreen : View {
                 tabWidgets[.flight(.selectAirport)] = AnyView(SelectAirportTab(onTabCallback: { type in
                     openWidget(tabWidgetType: type)
                 }))
+                airportsService.onFlightEndCallback = {
+                    openWidget(tabWidgetType: .flight(.destination))
+                }
+                
+                if settingsService.name == nil {
+                    openWidget(tabWidgetType: .avatar)
+                }
             }
         }
 //        .ignoresSafeArea(edges: .bottom)
