@@ -17,9 +17,9 @@ struct SelectDestinationAirportOverlay: View {
     @EnvironmentObject var locationService: LocationService
     
     func updateAirports() {
-        if let location = locationService.location {
+        if let departureAirport = airportsService.departureAirport {
             if let time = activeId {
-                airportsService.getShowableAirports(lat: location.latitude, lon: location.longitude, time: Double(time) * 600.0)
+                airportsService.getShowableAirports(lat: departureAirport.lat, lon: departureAirport.lon, time: Double(time) * 600.0)
             }
         }
     }
@@ -131,6 +131,15 @@ struct SelectDestinationAirportOverlay: View {
         }
         .frame(maxHeight: .infinity)
         .onAppear {
+            
+            if airportsService.departureAirport == nil {
+                if let position = locationService.location {
+                    if let airport = airportsService.findNearestAirport(lat: position.latitude, lon: position.longitude) {
+                        airportsService.setDepartureAirport(airport)
+                    }
+                }
+            }
+            
             updateAirports()
         }
     }

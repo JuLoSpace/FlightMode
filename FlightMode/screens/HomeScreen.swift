@@ -210,6 +210,9 @@ struct HomeScreen : View {
                 tabWidgets[.flight(.selectAirport)] = AnyView(SelectAirportTab(onTabCallback: { type in
                     openWidget(tabWidgetType: type)
                 }))
+                tabWidgets[.flight(.setLocation)] = AnyView(SelectDepartureAirportTab(onTabCallback: { type in
+                    openWidget(tabWidgetType: type)
+                }))
                 airportsService.onFlightEndCallback = {
                     openWidget(tabWidgetType: .flight(.destination))
                 }

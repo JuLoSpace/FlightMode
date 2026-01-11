@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-struct Airport: Codable, Equatable {
+struct Airport: Codable, Equatable, Hashable {
     let icao: String
     let iata: String?
     let name: String?
@@ -91,7 +91,6 @@ class AirportsService: ObservableObject {
     
     func loadHistoryFlights() {
         historyFlights = Storage.readFlights(airports: airports)
-        print(historyFlights?.count)
     }
     
     func search(_ query: String) -> [Airport] {
@@ -127,6 +126,35 @@ class AirportsService: ObservableObject {
             }
         }
         self.cityAirports = cityAirports
+    }
+    
+    func searchAirportsByQuery(_ query: String) -> [String: [Airport]] {
+        
+        let q = query.lowercased()
+        
+        let queryAirports = airports.filter { airport in
+            (airport.name?.lowercased().hasPrefix(q) ?? false) || airport.icao.lowercased().hasPrefix(q) || (airport.iata?.lowercased().hasPrefix(q) ?? false) || (airport.city?.lowercased().hasPrefix(q) ?? false)
+        }
+        
+        var out: [String: [Airport]] = [:]
+        
+        queryAirports.forEach { airport in
+            if let city = airport.city {
+                if out[city] == nil {
+                    out[city] = []
+                }
+                out[city]?.append(airport)
+            }
+        }
+        
+        return out
+    }
+    
+    func setDepartureAirport(_ departure: Airport) {
+        departureAirport = departure
+        if let mapMoveCallback = MapService.mapMoveCallback {
+            mapMoveCallback(departure.lat, departure.lon, 1.0, 2.0, 0)
+        }
     }
     
     func getShowableAirports(lat: Double, lon: Double, time: Double) {
