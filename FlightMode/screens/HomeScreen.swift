@@ -172,7 +172,8 @@ struct HomeScreen : View {
                             .clipShape(currentTabShape)
                         if ![TabWidgetType.home, TabWidgetType.flight(.selectAirport), TabWidgetType.flight(.fly(.map))].contains(currentTab) {
                             tabView
-                                .frame(maxHeight: geometry.size.height * 0.5)
+                                .frame(maxHeight: geometry.size.height * 0.5 + geometry.safeAreaInsets.bottom)
+                                .ignoresSafeArea(.keyboard)
                             if #available(iOS 26, *) {
                                 Button(action: {
                                     openWidget(tabWidgetType: .home)
@@ -222,7 +223,6 @@ struct HomeScreen : View {
                 }
             }
         }
-//        .ignoresSafeArea(edges: .bottom)
     }
 }
 

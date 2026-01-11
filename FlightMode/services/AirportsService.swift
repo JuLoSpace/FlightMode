@@ -130,11 +130,15 @@ class AirportsService: ObservableObject {
     
     func searchAirportsByQuery(_ query: String) -> [String: [Airport]] {
         
+        let AIRPORTS_LIMIT = 100
+        
         let q = query.lowercased()
         
-        let queryAirports = airports.filter { airport in
+        var queryAirports = airports.filter { airport in
             (airport.name?.lowercased().hasPrefix(q) ?? false) || airport.icao.lowercased().hasPrefix(q) || (airport.iata?.lowercased().hasPrefix(q) ?? false) || (airport.city?.lowercased().hasPrefix(q) ?? false)
         }
+        
+        queryAirports = Array(queryAirports.prefix(AIRPORTS_LIMIT))
         
         var out: [String: [Airport]] = [:]
         
