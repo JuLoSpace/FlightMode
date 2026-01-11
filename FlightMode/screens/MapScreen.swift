@@ -200,7 +200,7 @@ struct MapScreen: View {
             MapService.mapMoveToAirplanePosition = {
                 if let currentFlight = airportsService.currentFlight {
                     if let pos = currentFlight.flightProcess.position {
-                        animateMapTo(lat: pos.latitude, lon: pos.longitude, delta: 2.0, heading: 0)
+                        animateMapTo(lat: pos.latitude, lon: pos.longitude, delta: 1.0, duration: 2.0, heading: 0)
                     }
                 }
             }

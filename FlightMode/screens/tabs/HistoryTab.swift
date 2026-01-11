@@ -55,7 +55,8 @@ struct HistoryTab : View {
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
                     }
-                    .frame(width: geometry.size.width - 40, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
                     HStack(spacing: 10) {
                         ForEach(HistoryType.allCases, id: \.self) { historyType in
                             if #available(iOS 26, *) {
@@ -74,7 +75,7 @@ struct HistoryTab : View {
                             }
                         }
                     }
-                    .frame(width: geometry.size.width - 40, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 20)
                     if let flights = airportsService.historyFlights {
                         let showable: [Flight] = flights.filter {
@@ -86,6 +87,7 @@ struct HistoryTab : View {
                         ForEach(showable, id: \.self) { flight in
                             TicketView(width: .infinity, height: 200, flight: flight)
                                 .padding(.horizontal, 20)
+                                .padding(.top, 5)
                         }
                     }
                 }

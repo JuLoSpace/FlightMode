@@ -37,7 +37,6 @@ struct HomeScreen : View {
         .flightAcademy: AnyView(FlightAcademyTab()),
         .history: AnyView(HistoryTab()),
         .settings: AnyView(SettingsTab()),
-        .flight(.fly(.map)): AnyView(FlyTab()),
     ]
     
     @State var currentTab: TabWidgetType = TabWidgetType.home
@@ -53,10 +52,9 @@ struct HomeScreen : View {
     @State var overlayScreen: AnyView? = AnyView(HomeOverlay())
     
     @State var tabHeight: Double?
-    @State var track: Bool = false
+    @State var track: Bool = true
     
     func openWidget(tabWidgetType: TabWidgetType) {
-        currentTab = tabWidgetType
         switch tabWidgetType {
         case .home:
             currentTabShape = AnyShape(
@@ -117,14 +115,18 @@ struct HomeScreen : View {
             case .fly(let flyWidgetType):
                 switch flyWidgetType {
                 case .map:
+                    // remake in next updates
                     currentTabShape = AnyShape(
                         UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
                     )
-                    overlayContent = AnyView(FlyOverlay(flyWidgetType: flyWidgetType, track: $track, onTabCallback: { type in
+                    overlayContent = AnyView(FlyOverlay(track: $track, onTabCallback: { type in
                         openWidget(tabWidgetType: type)
                     }))
                     overlayScreen = nil
                 case .pause:
+                    currentTabShape = AnyShape(
+                        UnevenRoundedRectangle(cornerRadii: .init(topLeading: 32, topTrailing: 32))
+                    )
                     overlayScreen = nil
                 case .cockpit:
                     overlayScreen = nil
@@ -141,6 +143,12 @@ struct HomeScreen : View {
             overlayScreen = AnyView(ChooseAvatarScreen(onTabCallback: { type in
                 openWidget(tabWidgetType: type)
             }))
+        }
+        if currentTab == TabWidgetType.flight(.fly(.map)) &&
+            (tabWidgetType == TabWidgetType.flight(.fly(.map)) || tabWidgetType == TabWidgetType.flight(.fly(.cockpit)) || tabWidgetType == TabWidgetType.flight(.fly(.pause)) || tabWidgetType == TabWidgetType.flight(.fly(.music))) {
+            // code
+        } else {
+            currentTab = tabWidgetType
         }
     }
     

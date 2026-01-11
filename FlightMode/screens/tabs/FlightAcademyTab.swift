@@ -9,6 +9,35 @@ import SwiftUI
 
 struct FlightAcademyTab : View {
     
+    @EnvironmentObject var airportsService: AirportsService
+    
+    @State var totalFlights: Int?
+    @State var totalDistance: Int?
+    @State var successRate: Int?
+    @State var totalXP: Double?
+    @State var currentStreak: Double?
+    @State var longestStreak: Double?
+    
+    func computeStatistics(_ historyFlights: [Flight]?) {
+        
+        guard let flights = historyFlights else { return }
+        
+        totalFlights = flights.count
+        
+        var successCount: Int = 0
+        var distance: Double = 0
+        
+        flights.forEach { flight in
+            if flight.flightProcess.flightType == .success {
+                successCount += 1
+            }
+            distance += MetricsService.distance(a: flight.airportDeparture, b: flight.airportDestination)
+        }
+        
+        totalDistance = Int(distance / 1000)
+        successRate = Int(100 * successCount / flights.count)
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -84,47 +113,162 @@ struct FlightAcademyTab : View {
                             .glassEffect()
                         }
                         .padding(.horizontal, 20)
-                        VStack {
-                            ForEach(0..<5, id: \.self) { i in
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text("Flight")
-                                            .font(.custom("Montserrat", size: 24))
-                                            .foregroundStyle(.white.opacity(0.5))
-                                        Text("24")
-                                            .font(.custom("Montserrat", size: 32))
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.white)
-                                            .padding(.top, 20)
-                                    }
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 20)
-                                    .frame(width: geometry.size.width * 0.44, alignment: .leading)
-                                    .background(Color.white.opacity(0.1))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    VStack(alignment: .leading) {
-                                        Text("Flight")
-                                            .font(.custom("Montserrat", size: 24))
-                                            .foregroundStyle(.white.opacity(0.5))
-                                        Text("24")
-                                            .font(.custom("Montserrat", size: 32))
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(.white)
-                                            .padding(.top, 20)
-                                    }
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 20)
-                                    .frame(width: geometry.size.width * 0.44, alignment: .leading)
-                                    .background(Color.white.opacity(0.1))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Flight")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let totalFlights = totalFlights {
+                                    Text(String(totalFlights))
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("No flights")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
                                 }
                             }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            VStack(alignment: .leading) {
+                                Text("Success Rate")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let successRate = successRate {
+                                    Text("\(successRate)%")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("No rate")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
                         .padding(.horizontal, 20)
-                        .frame(width: geometry.size.width)
+                        .frame(maxWidth: .infinity)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Total distance")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let totalDistance = totalDistance {
+                                    Text("\(totalDistance) km")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("No flights")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            VStack(alignment: .leading) {
+                                Text("Total XP")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let totalXP = totalXP {
+                                    Text(String(totalXP))
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("0")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Current Streak")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let currentStreak = currentStreak {
+                                    Text(String(currentStreak))
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("0")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            VStack(alignment: .leading) {
+                                Text("Longest Streak")
+                                    .font(.custom("Montserrat", size: 18))
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.white.opacity(0.5))
+                                Spacer()
+                                if let longestStreak = longestStreak {
+                                    Text(String(longestStreak))
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("0")
+                                        .font(.custom("Montserrat", size: 24))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .padding(.vertical, 20)
+                            .padding(.horizontal, 20)
+                            .frame(width: geometry.size.width * 0.44, height: 150, alignment: .leading)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity)
                     }
                 }
             }
+        }
+        .onAppear {
+            computeStatistics(airportsService.historyFlights)
         }
     }
 }

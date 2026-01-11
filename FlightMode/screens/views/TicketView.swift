@@ -67,7 +67,7 @@ struct TicketView: View {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .top) {
-                        Text(flight.airportDeparture.icao)
+                        Text(flight.airportDeparture.iata ?? flight.airportDeparture.icao)
                             .font(.custom("Montserrat", size: 28))
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
@@ -90,7 +90,7 @@ struct TicketView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        Text(flight.airportDestination.icao)
+                        Text(flight.airportDestination.iata ?? flight.airportDestination.icao)
                             .font(.custom("Montserrat", size: 28))
                             .fontWeight(.bold)
                             .foregroundStyle(.white)
@@ -124,13 +124,16 @@ struct TicketView: View {
                     DottedLine().stroke(
                         style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [2, 16])
                     )
-                    .frame(width: max(width - 60, 0), height: 1)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 1)
                     .padding(.horizontal, 30)
                     .foregroundStyle(.white.opacity(0.05))
-                    .frame(width: width, height: 20, alignment: .bottom)
+                    .frame(maxWidth: width)
+                    .frame(height: 20, alignment: .bottom)
                     .contentShape(.rect)
                 }
-                .frame(width: width, height: height / 2, alignment: .bottom)
+                .frame(maxWidth: width)
+                .frame(height: height / 2, alignment: .bottom)
                 .background(LinearGradient(colors: [
                     Color(hex: "323232"),
                     Color(hex: "212121")
@@ -140,7 +143,8 @@ struct TicketView: View {
                     DottedLine().stroke(
                         style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [2, 16])
                     )
-                    .frame(width: max(width - 60, 0), height: 1, alignment: .top)
+                    .frame(maxWidth: .infinity, alignment: .top)
+                    .frame(height: 1)
                     .padding(.horizontal, 30)
                     .foregroundStyle(.white.opacity(0.05))
                     Spacer()
@@ -204,7 +208,8 @@ struct TicketView: View {
                     .padding(.horizontal, 30)
                     Spacer()
                 }
-                .frame(width: width, height: height / 2, alignment: .center)
+                .frame(maxWidth: width, alignment: .center)
+                .frame(height: height / 2)
                 .background(LinearGradient(colors: [
                     Color(hex: "323232"),
                     Color(hex: "212121")

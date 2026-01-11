@@ -64,14 +64,14 @@ class Flight: ObservableObject, Hashable, Equatable {
     
     var id: UUID?
     
-    var flightProcess: FlightProcess
+    @Published var flightProcess: FlightProcess
     let airportDeparture: Airport
     let airportDestination: Airport
     var timeDeparture: Date?
     var timeDestination: Date?
     var depart: Bool = false
     
-    var stops: [TimeInterval] = []
+    var stops: [Date] = []
     
     var onFlightEndCallback: (() -> ())?
     
@@ -111,9 +111,12 @@ class Flight: ObservableObject, Hashable, Equatable {
         return MetricsService.airplaneAverageSpeed
     }
     
-    func startFlight() {
-        timeDeparture = Date.now
-        self.flightProcess.position = Position(latitude: airportDeparture.lat, longitude: airportDeparture.lon)
+    func startFlight(isStopped: Bool = false) {
+        if !isStopped {
+            timeDeparture = Date.now
+            self.flightProcess.position = Position(latitude: airportDeparture.lat, longitude: airportDeparture.lon)
+        }
+        flightProcess.flightType = .process
         timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(0.01), repeats: true) { [weak self] _ in
             guard let self = self else { return }
             if let timeDeparture = self.timeDeparture {
@@ -149,12 +152,15 @@ class Flight: ObservableObject, Hashable, Equatable {
         timeDestination = Date.now
     }
     
-    func stop() {
-        
+    func pause() {
+        timer?.invalidate()
+        timer = nil
+        flightProcess.flightType = .pause
+        stops.append(Date.now)
     }
     
     func run() {
-        
+        startFlight(isStopped: true)
     }
     
     static func ==(_ lhs: Flight, _ rhs: Flight) -> Bool {

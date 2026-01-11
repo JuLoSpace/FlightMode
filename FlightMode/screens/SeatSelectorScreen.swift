@@ -162,6 +162,7 @@ struct SeatSelectorScreen: View {
                                 .foregroundStyle(Color(hex: "FFAE17"))
                         }
                         .padding(.horizontal, 20)
+                        .zIndex(1)
                         Spacer()
                         Image("airplane")
                             .resizable()
@@ -273,12 +274,13 @@ struct SeatSelectorScreen: View {
                                             Image("letsGo_1")
                                                 .frame(width: btnSize, height: btnSize)
                                                 .glassEffect(.clear.tint(Color(hex: "FFAE17")).interactive())
+                                                .shadow(radius: 10)
                                         }
                                         .frame(width: buttonGeometry.size.width, alignment: .leading)
                                         .gesture(DragGesture().onChanged { value in
                                             letsGoOffset = value.location.x
                                         }.onEnded { value in
-                                            if value.location.x >= buttonGeometry.size.width / 2 {
+                                            if value.location.x >= geometry.size.width / 2 {
                                                 withAnimation(.easeInOut) {
                                                     letsGoOffset = buttonGeometry.size.width
                                                 }
@@ -323,6 +325,12 @@ struct SeatSelectorScreen: View {
                                                 .padding(.horizontal, 12)
                                                 .padding(.vertical, 16)
                                                 .glassEffect(.regular.tint(selectedMission == mission ? Color(hex: "FFAE17").opacity(0.5) : .white.opacity(0.15)).interactive())
+                                                .overlay {
+                                                    if selectedMission == mission {
+                                                        RoundedRectangle(cornerRadius: .infinity).stroke(style: StrokeStyle(lineWidth: 2))
+                                                            .foregroundStyle(Color(hex: "FFAE17"))
+                                                    }
+                                                }
                                                 .padding(.horizontal, 5)
                                                 .onTapGesture {
                                                     selectedMission = mission

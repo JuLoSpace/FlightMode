@@ -24,7 +24,7 @@ enum FlightWidgetType: Hashable {
     case destination
 }
 
-enum FlyWidgetType: Hashable {
+enum FlyWidgetType: Hashable, CaseIterable {
     case map
     case cockpit
     case music
